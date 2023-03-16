@@ -21,6 +21,10 @@
 		formContainer: 'body',
 		excludedFields: ['name2', 'notreal']  // id, name or class
 	}
+	
+	// Project key. Get this value from FormComplete.
+	window.ZIProjectKey = "0281657f921669107410"; 
+
 
 	// Form Class.
 	class ZI_Form {
@@ -180,5 +184,18 @@
 	s.id = 'ZI_AF';
 	s.innerHTML = `${configurations['formSelector']} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
 	document.head.appendChild(s);
+	
+	// Add base logic once document has loaded.
+	document.addEventListener('DOMContentLoaded', function() {
 
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
+		document.readyState === 'complete'?
+		document.body.appendChild(zi):
+		window.addEventListener('load', function(){document.body.appendChild(zi)});
+	
+	}, { once:true, capture:true });
+	
 })();
