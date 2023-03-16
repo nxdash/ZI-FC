@@ -198,4 +198,6 @@
 	
 	}, { once:true, capture:true });
 	
+	console.log('ZI - FormComplete snippet loaded.');
+	
 })();
