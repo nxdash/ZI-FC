@@ -15,7 +15,7 @@
 	 *     text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
 	 *   
 	 */
-	const configurations = {
+	var configurations = {
 		dynamic: false,  // set to true if form does not exist imediatly in document.
 		formSelector: '#example1',
 		formContainer: 'body',
