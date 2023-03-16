@@ -1,186 +1,184 @@
 (function() {
-
-	/** Configuration
-	 *
-	 *		formSelector
-	 *			This can be any query selector such as #FormID, #FormName, .FormClass1.Class2.Class3, or Form[action="URL"]
-	 *
-	 *		exclude
-	 *			This is to exclude certain input and select fields from being hidden. By default, email never hidden.
-	 *			The attributes we support are id, name, and class and we look to see if the value provided it within the attribute value, so an exact match is not required.
-	 *
-	 *		formContainer
-	 *			Only use if form is not populated at load. Useful for dynamically created forms. 
-	 *			This can be any query selector value, and the closer the container is to the form that will populate, the less front-end overhead though 'body' should be acceptable.
-	 *
-	 *		fieldContainer
-	 *			Use if the containing element has an ID, Name and or Class.
-	 *			The value would be attribute value, excluding periods, hashes, or brackets.
-	 *
-	 *		fieldContainerExact
-	 *			This can be ignored if fieldContainer is empty, otherwise this determines if an exact match is required. Recommended to use false.
-	 *
+	
+	/** Configurations
+	 *  
+	 *   dynamic
+	 *     boolean; if true, we will observe the formContainer element and wait for the form to be created. Not needed if form exist in DOM at load.
+	 *  
+	 *   formSelector
+	 *     query selector value, example #FormID, .FormClass, Form[Attribute=Value]; This is used to locate the form within a document.
+	 *  
+	 *   formContainer
+	 *     query selector value, example #FormContainerID, .FormContainerClass, FormContainer[Attribute=Value]; This is used to locate the form container within a document. This is only needed if 'dynamic' is true. Default value: body.
+	 *  
+	 *   excludedFields
+	 *     text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
+	 *   
 	 */
-	const formSelector = '#example1';
-	const exclude = ['name2', 'notreal'];
-	const formContainer = 'body';
-	const fieldContainer = '';
-	const fieldContainerExact = false;
-	const debug = false;
-	
-
-	// Anti-flicker style element.
-	const s = document.createElement('style');
-	s.id = 'ZiAF';// Set ID so we can remove after hidding fields.
-	s.innerHTML = `${formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
-	document.head.appendChild(s);
-	
-
-
-
-
-	// Data from the endpoint is accessable through the following:
-	window._zi_fc.onReady = function(data) {
-	console.log('ZI Data', data);
-	data.inputs.forEach(function(input) {
-			console.log('ZI Input', input);
-	});
-
-
-
-
-	// Get Context - From Hayden. Checks for Hubspot iframes, returns the context where the selector resides.
-	// Not implemented here yet.
-    function getContext(selector) {
-        var iframes = document.getElementsByClassName('hs-form-iframe');
-        if(iframes) {
-            for(var i = 0; i < iframes.length; i+=1) {
-                if(iframes[i].contentDocument.querySelector(selector))
-                    return iframes[i].contentDocument;
-            }
-        }
-        return document;
-    }
-
-
-	// Find field container.
-	function findContainer(e) {
-		const p = e.parentElement;
-		if (!p) {return false;}
-		if (fieldContainer.length !== 0) {// Does fieldContainer have a value assigned?
-			if (
-				(fieldContainerExact && ['id', 'name', 'class'].some(identifier => p[identifier] === fieldContainer || p.classList.contains(fieldContainer))) || // Check if fieldContainer value matches the ID, Name or Class. 
-				(!fieldContainerExact && ['id', 'name', 'class'].some(identifier => p.hasOwnProperty(identifier) && p[identifier] && p[identifier].includes(fieldContainer) || p.classList.contains(fieldContainer))) // Check if fieldContainer value is present in ID, Name or Class.
-			) {return p;}
-			return findContainer(p);
-		} else {// Hide the furthest parent node from the field with a single child element, excluding label.
-			const c = p.children, n = c.length;
-			if (n == 1 || (n == 2 && c[0].tagName.toLowerCase() == 'label')) {return findContainer(p);}
-			return e;
-		}
-		
+	const configurations = {
+		dynamic = false,  // set to true if form does not exist imediatly in document.
+		formSelector = '#example1',
+		formContainer = 'body',
+		excludedFields = ['name2', 'notreal']  // id, name or class
 	}
-	
-	
-	// Hide fields.
-	function hideFields() {
+
+	// Form Class.
+	class ZI_Form {
 		
-		const form = document.querySelector(formSelector);
-		if (form) {
+		constructor( data, configurations ) {
 			
-			console.log('Form object detected:', form);
+			console.log('ZI - Constructing form object...', data);
 			
-			// Loop through all form elements.
-			Array.from(form.elements).forEach( e => {
+			// Store configurations.
+			this.configurations = configurations;
 
-				const isField = ['INPUT', 'SELECT'].includes(e.nodeName);
-				const isButton = e.hasAttribute('type') && ['reset', 'button', 'submit'].includes(e.getAttribute('type').toLowerCase());
-				const isEmail = ['id', 'name', 'class'].some(identifier => e[identifier] && e[identifier].includes('email') || e.classList.contains('email'));
-				const isExcluded = exclude.includes(e.id) || exclude.includes(e.name) || e.classList.contains(exclude);
-
-				if (isField && !isButton && !isEmail && !isExcluded) {
-					const container = findContainer(e);
-					if (container) {container.style.display = 'none';}
-					else {console.log('Container ('+fieldContainer+') not found.', e);}
-				}
+			// Store context where form resides. This searches sourceless iframes as well.
+			this.context = this.getContext(data.formSelector);
+			
+			// Dynamic enabled?
+			if (this.configurations['dynamic']) {
 				
-			});
-			
-			// Remove temp form style.
-			document.getElementById('ZiAF').remove();
-			
-		} else {
-			
-			console.log('Form not detected.');
-			
-		}
-	}
+				// Define Mutation Observer 
+				const formWatch = function(mutationsList, observer) {
+					for(const mutation of mutationsList) {
+						if (mutation.type === 'childList') {
+							for (const e of mutation.addedNodes) {
+								if (e.tagName.toLowerCase() === 'form') {
+									
+									console.log('ZI - Form added to ' + this.configurations['formContainer'] + '.');
 
+									// Maybe check here... data.formSelector == e.id || ...
+									this.readyForm(data);
+									
+									// Stop observer.
+									observer.disconnect();
 
-	// Find forms.
-	document.addEventListener('DOMContentLoaded', function() {
-
-		// Mutation Observer 
-		if (formContainer.length !== 0) {
-
-			const callback = function(mutationsList, observer) {
-				for(const mutation of mutationsList) {
-					if (mutation.type === 'childList') {
-						for (const e of mutation.addedNodes) {
-							if (e.tagName.toLowerCase() === 'form') {
-
-								console.log('Form added to ' + formContainer + '.');
-								hideFields();
-
+								}
 							}
 						}
 					}
+				};
+				
+				const watchContainer = this.context.querySelector(this.configurations['formContainer']);// using form context... hope things play nice...
+				if ( watchContainer !== null ) {
+
+					// Create observer instance linked to formWatch callback
+					const observer = new MutationObserver(formWatch);
+
+					// Start observing formContainer for mutations.
+					observer.observe( watchContainer, {childList:true} );
+
+				} else {
+
+					console.log('ZI - Form container ('+ this.configurations['formContainer'] +') not found. Recommended default: body');
+
 				}
-			};
-
-			// Create observer instance linked to callback
-			const observer = new MutationObserver(callback);
-
-			// Start observing formContainer for mutations.
-			observer.observe(document.querySelector(formContainer), {childList:true});
-			
-		} else {
-			
-			// All forms are already in DOM. Begin.
-			hideFields();
-			
-		}
-
-	// Remove listener at completion.
-	}, {once: true, capture: true});
-
-
-	// Get List Of Entitlements - From zi-tag.js
-	const GetListOfEntitlements=async()=>{
-		const ZI_TAG_BACKEND_URL = "https://js.zi-scripts.com/unified/v1/master/getSubscriptions";
-		try{
-			let response = await fetch(ZI_TAG_BACKEND_URL, {method:"GET",headers:{"Content-Type":"application/json", Authorization:"Bearer " + window.ZIProjectKey}});
-			console.log("ZI Response",response);
-			const data=await response.json();
-			console.log("ZI data",data);
-
-			if( response.status === 200 && data && data.subscriptions){
-				let subscriptions=data?.subscriptions;
-				if(subscriptions.length===0){console.log("No ZI subscriptions found")}
-				if(subscriptions.sch){InsertScheduleScript(subscriptions.sch)}
-				if(subscriptions.fc){InsertFormCompleteScript(subscriptions.fc)}
-				if(subscriptions.chat){InsertChatScript(subscriptions.chat)}
 
 			} else {
-				console.log("error with response",response.body)
+			
+				// Ready form.
+				this.readyForm(data);
+			
+			}
+
+		}
+
+		// Get context for form.
+		getContext(selector) {
+			
+			var iframes = document.getElementsByClassName('hs-form-iframe');
+			if(iframes) {
+				for( var i=0; i < iframes.length; i+=1 ) {
+					if( iframes[i].contentDocument.querySelector(selector) )
+						return iframes[i].contentDocument;
+				}
 			}
 			
-		} catch(e) {
-			console.error("ZI error", e)
+			return document;
+			
+		}
+
+		// Ready form when form is loaded.
+		readyForm(data) {
+			
+			console.log('ZI - Readying form...');
+			data.inputs.forEach(function(input){this.readyField(context.querySelector(data.formSelector+' '+input));});
+			document.getElementById('ZI_AF').remove();// Remove Antiflicker style.
+			
 		}
 		
-	};
-	GetListOfEntitlements();
+		// Update form when a match is found by ZI API.
+		updateForm(data) {
+			
+			console.log('ZI - Updating form...');
+			data.inputs.forEach(function(input){this.updateField( context.querySelector(data.formSelector+' '+input), input, data );});
+			
+		}
 
+		// Hide mapped field that is not email nor an excluded field in configurations.
+		readyField(field) {
+			
+			// Analyze field.
+			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
+			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
+			const isEmail = ['id', 'name', 'class'].some(identifier => field[identifier] && field[identifier].includes('email') || field.classList.contains('email'));
+			const isExcluded = excludedFields.includes(field.id) || excludedFields.includes(field.name) || field.classList.contains(excludedFields);
+
+			if (isField && !ignoredType && !isEmail && !isExcluded) {
+				const fieldContainer = findContainer(field);
+				if (fieldContainer) {fieldContainer.style.display = 'none';}
+				else {console.log('ZI - Field Container not found.', field);}
+			}
+			
+		}
+		
+		// Update mapped field that is not email nor an excluded field in configurations. If an element is hidden by end-user and is excluded, we will not unhide element spite it being hidden + unpopulated with data, end-user will need to unhide with their own logic if excluded. 
+		updateField( field, input, data ) {
+			
+			// If field populated, ignore.
+			if ( data[input] != undefined ) {return;}
+
+			// Find field container.
+			const fieldContainer = findContainer(field);
+			if (!fieldContainer) {
+				console.log('ZI - Field Container not found.', field);
+				return;
+			}
+
+			// If field is displayed, ignore.
+			if ( fieldContainer.style.display != 'none' ){return;}
+
+			// Analyze field.
+			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
+			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
+			const isExcluded = excludedFields.includes(field.id) || excludedFields.includes(field.name) || field.classList.contains(excludedFields);
+
+			// Field was not populated and is not excluded, display it.
+			if ( isField && !ignoredType && !isExcluded ) {fieldContainer.style.display = '';}
+
+		}
+		
+	}
+
+    // Ensure fc variable is initialized.
+    if(!window._zi_fc){window._zi_fc = {};}
+	
+	// Initialize when ready.
+	window._zi_fc.onReady = function( data, configurations ) {
+		ZI_Form = new ZI_Form( data, configurations );
+		ZI_Forms.readyForm();
+	}
+	
+	// Listen for ZI API matches.
+	window._zi_fc.onMatch = function(data) {
+		ZI_Forms.updateForm();
+	}
+
+	// Antiflicker.
+	!!! At present, this only applies in the doc, not inside iframes.
+	const s = document.createElement('style');
+	s.id = 'ZI_AF';
+	s.innerHTML = `${configurations['formSelector']} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
+	document.head.appendChild(s);
 
 })();
