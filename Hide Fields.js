@@ -16,10 +16,10 @@
 	 *   
 	 */
 	const configurations = {
-		dynamic = false,  // set to true if form does not exist imediatly in document.
-		formSelector = '#example1',
-		formContainer = 'body',
-		excludedFields = ['name2', 'notreal']  // id, name or class
+		dynamic: false,  // set to true if form does not exist imediatly in document.
+		formSelector: '#example1',
+		formContainer: 'body',
+		excludedFields: ['name2', 'notreal']  // id, name or class
 	}
 
 	// Form Class.
