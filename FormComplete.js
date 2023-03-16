@@ -29,7 +29,7 @@
 	// Form Class.
 	class ZI_Form {
 		
-		constructor( data, configurations ) {
+		constructor( data, configurations, formShorteningEnabled, isDevelopementMode ) {
 			
 			console.log('ZI - Constructing form object...', data, configurations);
 			
@@ -90,6 +90,8 @@
 		// Get context for form.
 		getContext(selector) {
 			
+			// formIframeWrapperSelector "iframe.hs-form-iframe"
+			
 			var iframes = document.getElementsByClassName('hs-form-iframe');
 			if(iframes) {
 				for( var i=0; i < iframes.length; i+=1 ) {
@@ -106,6 +108,9 @@
 		readyForm(data) {
 			
 			console.log('ZI - Readying form...');
+			
+			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
+			
 			data.inputs.forEach(function(input){this.readyField(this.context.querySelector(data.formSelector+' '+input));});
 			document.getElementById('ZI_AF').remove();// Remove Antiflicker style.
 			//this.context.getElementById('ZI_AF').remove();// Remove Antiflicker style.  !! At present, style is only populated in primary context, and not in iframes if that is where form resides.
@@ -165,12 +170,31 @@
 		
 	}
 
+	// Notification Class.
+	class ZI_Notification {
+		
+		/*
+		
+			isDevelopementMode boolean
+		
+		*/
+		
+		constructor( type, message ) {
+			
+			
+			
+		}
+		
+		
+		
+	}
+
     // Ensure fc variable is initialized.
     if(!window._zi_fc){window._zi_fc = {};}
 	
 	// Initialize when ready.
 	window._zi_fc.onReady = function( data, configurations ) {
-		ZI_Form = new ZI_Form( data, configurations );
+		ZI_Form = new ZI_Form( data, configurations, this.formShorteningEnabled, this.isDevelopementMode );
 	}
 	
 	// Listen for ZI API matches.
