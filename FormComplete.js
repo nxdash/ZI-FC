@@ -106,8 +106,9 @@
 		readyForm(data) {
 			
 			console.log('ZI - Readying form...');
-			data.inputs.forEach(function(input){this.readyField(context.querySelector(data.formSelector+' '+input));});
+			data.inputs.forEach(function(input){this.readyField(this.context.querySelector(data.formSelector+' '+input));});
 			document.getElementById('ZI_AF').remove();// Remove Antiflicker style.
+			//this.context.getElementById('ZI_AF').remove();// Remove Antiflicker style.  !! At present, style is only populated in primary context, and not in iframes if that is where form resides.
 			
 		}
 		
@@ -115,7 +116,7 @@
 		updateForm(data) {
 			
 			console.log('ZI - Updating form...');
-			data.inputs.forEach(function(input){this.updateField( context.querySelector(data.formSelector+' '+input), input, data );});
+			data.inputs.forEach(function(input){this.updateField( this.context.querySelector(data.formSelector+' '+input), input, data );});
 			
 		}
 
@@ -170,7 +171,7 @@
 	// Initialize when ready.
 	window._zi_fc.onReady = function( data, configurations ) {
 		ZI_Form = new ZI_Form( data, configurations );
-		ZI_Forms.readyForm();
+		ZI_Forms.readyForm(data);
 	}
 	
 	// Listen for ZI API matches.
@@ -179,7 +180,7 @@
 	}
 
 	// Antiflicker.
-	// !!! At present, this only applies in the doc, not inside iframes.
+	//!!! At present, this only applies in the doc, not inside iframes.
 	const s = document.createElement('style');
 	s.id = 'ZI_AF';
 	s.innerHTML = `${configurations['formSelector']} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
