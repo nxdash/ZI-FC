@@ -179,7 +179,7 @@
 	}
 
 	// Antiflicker.
-	!!! At present, this only applies in the doc, not inside iframes.
+	// !!! At present, this only applies in the doc, not inside iframes.
 	const s = document.createElement('style');
 	s.id = 'ZI_AF';
 	s.innerHTML = `${configurations['formSelector']} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
