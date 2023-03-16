@@ -1,6 +1,5 @@
 (function() {
 
-
 	/** Configuration
 	 *
 	 *		formSelector
@@ -22,13 +21,13 @@
 	 *			This can be ignored if fieldContainer is empty, otherwise this determines if an exact match is required. Recommended to use false.
 	 *
 	 */
-	const formSelector = '#example4';
+	const formSelector = '#example1';
 	const exclude = ['name2', 'notreal'];
 	const formContainer = 'body';
 	const fieldContainer = '';
 	const fieldContainerExact = false;
 	const debug = false;
-
+	
 
 	// Anti-flicker style element.
 	const s = document.createElement('style');
@@ -36,7 +35,34 @@
 	s.innerHTML = `${formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
 	document.head.appendChild(s);
 	
-	
+
+
+
+
+	// Data from the endpoint is accessable through the following:
+	window._zi_fc.onReady = function(data) {
+	console.log('ZI Data', data);
+	data.inputs.forEach(function(input) {
+			console.log('ZI Input', input);
+	});
+
+
+
+
+	// Get Context - From Hayden. Checks for Hubspot iframes, returns the context where the selector resides.
+	// Not implemented here yet.
+    function getContext(selector) {
+        var iframes = document.getElementsByClassName('hs-form-iframe');
+        if(iframes) {
+            for(var i = 0; i < iframes.length; i+=1) {
+                if(iframes[i].contentDocument.querySelector(selector))
+                    return iframes[i].contentDocument;
+            }
+        }
+        return document;
+    }
+
+
 	// Find field container.
 	function findContainer(e) {
 		const p = e.parentElement;
@@ -127,6 +153,34 @@
 
 	// Remove listener at completion.
 	}, {once: true, capture: true});
+
+
+	// Get List Of Entitlements - From zi-tag.js
+	const GetListOfEntitlements=async()=>{
+		const ZI_TAG_BACKEND_URL = "https://js.zi-scripts.com/unified/v1/master/getSubscriptions";
+		try{
+			let response = await fetch(ZI_TAG_BACKEND_URL, {method:"GET",headers:{"Content-Type":"application/json", Authorization:"Bearer " + window.ZIProjectKey}});
+			console.log("ZI Response",response);
+			const data=await response.json();
+			console.log("ZI data",data);
+
+			if( response.status === 200 && data && data.subscriptions){
+				let subscriptions=data?.subscriptions;
+				if(subscriptions.length===0){console.log("No ZI subscriptions found")}
+				if(subscriptions.sch){InsertScheduleScript(subscriptions.sch)}
+				if(subscriptions.fc){InsertFormCompleteScript(subscriptions.fc)}
+				if(subscriptions.chat){InsertChatScript(subscriptions.chat)}
+
+			} else {
+				console.log("error with response",response.body)
+			}
+			
+		} catch(e) {
+			console.error("ZI error", e)
+		}
+		
+	};
+	GetListOfEntitlements();
 
 
 })();

@@ -1,0 +1,179 @@
+<html>
+<head>
+
+	<title>Testing Hide Fields</title>
+	
+	<script>
+		window.ZIProjectKey = "0281657f921669107410"; 
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
+		document.readyState === 'complete'?
+		document.body.appendChild(zi):
+		window.addEventListener('load', function(){document.body.appendChild(zi)});
+	</script>
+	
+	<script src="Hide Fields.js"></script>
+	<style>
+		body {
+			background-color:#EEEEEE;
+			padding:10px;
+			font:10px Verdana;
+			color:#222;
+			line-height:12px;
+		}
+		form {
+			background-color:#FFFFFF;
+			border:1px solid #DEDEDE;
+			padding:10px;
+			margin:10px 0px;
+			display:block;
+		}
+		h3 {
+			line-height:20px;
+		}
+		input,
+		select {
+			background-color:#FFFFFF;
+			border:1px solid #DEDEDE;
+			padding:10px;
+			margin:3px 0px;
+			height:32px;
+			width:300px;
+			padding:6px;
+		}
+		button,
+		input[type=reset],
+		input[type=button],
+		input[type=submit] {
+			width:150px;
+		}
+		label {
+			display:inline-block;
+			width:50px;
+		}
+	</style>
+	<script>
+	
+		// Create a form dynamically to test mutation lisenter.
+		setTimeout(function(){
+			const form = document.createElement('form');
+			form.id = 'example4';
+			form.innerHTML = `
+			<h3>Example 4: Dynamic form, no field containers or labels. Does not exist in DOM @ load completion</h3>
+			<input id="email" value="Email"><br><input id="name" value="Name"><br>
+			<input id="company" value="Company"><br>
+			<select id="country">
+				<option value="1">USA</option>
+				<option value="2">Japan</option>
+				<option value="3">Canada</option>
+			</select><br>
+			<input type="button" value="Continue">
+			`;
+			document.body.appendChild(form);
+		},2000);
+	
+	</script>
+	<!--/
+	
+		This script must do the following:
+			Hide form elements (including any container items) that are not excluded and exclude any element that contains 'email' in the id/name/class value.
+			prevent flickering of the form as items are hidden
+			have unhide functionality when receiving a json response from the endpoint that returns a value for a field
+			has the added option to also hide the field (check if the field is already hidden, and if so, add to ignore list)
+	/-->
+
+</head>
+<body>
+
+	<form id="example1">
+		<h3>Example 1: Basic form, no field containers or labels.</h3>
+		<input id="email" value="Email"><br>
+		<input id="name" value="Name"><br>
+		<input id="company" value="Company"><br>
+		<select id="country">
+			<option value="1">USA</option>
+			<option value="2">Japan</option>
+			<option value="3">Canada</option>
+		</select><br>
+		<input type="button" value="Continue">
+	</form>
+
+	<form id="example2">
+		<h3>Example 2: Simple form, label + no attribute div container.</h3>
+		<div>
+			<label for="email2">Email</label>
+			<input id="email2" value="Email">
+		</div>
+
+		<div>
+			<label for="name2">Name</label>
+			<input id="name2" value="Never Exclude">
+		</div>
+
+		<div>
+			<label for="company2">Company</label>
+			<input id="company2" value="Company">
+		</div>
+
+		<div>
+			<label for="country2">Country</label>
+			<select id="country2">
+				<option value="1">USA</option>
+				<option value="2">Japan</option>
+				<option value="3">Canada</option>
+			</select>
+		</div>
+
+		<input type="button" value="Continue">
+
+	</form>
+
+	<form id="example3">
+		<h3>Example 3: Simple form, label + span + no attribute div  + div container with class.</h3>
+		<div class="fieldx">
+			<div>
+				<label for="email2">Email</label>
+				<input id="email2" value="Email">
+				<span class="instructions"><span>
+			</div>
+		</div>
+
+		<div class="fieldx">
+			<div>
+				<label for="name2">Name</label>
+				<input id="name2" value="Never Exclude">
+				<span class="instructions"><span>
+			</div>
+			<span class="notes"><span>
+		</div>
+
+		<div class="fieldx">
+			<div>
+				<label for="company2">Company</label>
+				<input id="company2" value="Company">
+				<span class="instructions"><span>
+			</div>
+			<span class="notes"><span>
+		</div>
+
+		<div class="fieldx">
+			<div>
+				<label for="country2">Country</label>
+				<select id="country2">
+					<option value="1">USA</option>
+					<option value="2">Japan</option>
+					<option value="3">Canada</option>
+				</select>
+				<span class="instructions"><span>
+			</div>
+		</div>
+
+		<input type="button" value="Continue">
+
+	</form>
+
+
+</body>
+</html>
