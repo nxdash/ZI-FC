@@ -31,7 +31,7 @@
 		
 		constructor( data, configurations ) {
 			
-			console.log('ZI - Constructing form object...', data);
+			console.log('ZI - Constructing form object...', data, configurations);
 			
 			// Store configurations.
 			this.configurations = configurations;
@@ -130,7 +130,7 @@
 			const isExcluded = excludedFields.includes(field.id) || excludedFields.includes(field.name) || field.classList.contains(excludedFields);
 
 			if (isField && !ignoredType && !isEmail && !isExcluded) {
-				const fieldContainer = findContainer(field);
+				const fieldContainer = this.findContainer(field);
 				if (fieldContainer) {fieldContainer.style.display = 'none';}
 				else {console.log('ZI - Field Container not found.', field);}
 			}
@@ -171,12 +171,11 @@
 	// Initialize when ready.
 	window._zi_fc.onReady = function( data, configurations ) {
 		ZI_Form = new ZI_Form( data, configurations );
-		ZI_Forms.readyForm(data);
 	}
 	
 	// Listen for ZI API matches.
 	window._zi_fc.onMatch = function(data) {
-		ZI_Forms.updateForm();
+		ZI_Forms.updateForm(data);
 	}
 
 	// Antiflicker.
@@ -193,9 +192,7 @@
 		(zi.type = 'text/javascript'),
 		(zi.async = true),
 		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
-		document.readyState === 'complete'?
-		document.body.appendChild(zi):
-		window.addEventListener('load', function(){document.body.appendChild(zi)});
+		document.body.appendChild(zi);
 	
 	}, { once:true, capture:true });
 	
