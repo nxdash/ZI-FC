@@ -136,6 +136,8 @@
 		// Hide mapped field that is not email nor an excluded field in configurations.
 		readyField(field) {
 			
+			console.log('ZI Field', field);
+			
 			// Analyze field.
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
 			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
