@@ -115,13 +115,8 @@
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
 			if (formShorteningEnabled) {
 				data.inputs.forEach(function(input){
-					
-					
-					console.warn('--BREAKPOINT--', data.formSelector );
-					console.warn('--BREAKPOINT--', input );
-					
-					this.readyField(this.context.querySelector(data.formSelector+' '+input));
-				}.bind( this, data ));
+					this.readyField(this.context.querySelector(data.formSelector+' '+input), data);
+				}.bind(this, input));
 			}
 
 			// Remove Antiflicker.
@@ -130,14 +125,16 @@
 		}
 		
 		// Update form when a match is found by ZI API.
-		updateForm(data) {
+		updateForm( data, formShorteningEnabled ) {
+			
+			if (!formShorteningEnabled) {return;}
 			
 			console.log('ZI - Updating form...');
-			
+
 			data.inputs.forEach(function(input){
-				this.updateField( this.context.querySelector(data.formSelector+' '+input), input, data );
-			}.bind( this, data ));
-			
+				this.updateField(this.context.querySelector(data.formSelector+' '+input), data);
+			}.bind(this, input));
+
 		}
 
 		// Hide mapped field that is not email nor an excluded field in configurations.
@@ -219,7 +216,7 @@
 	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.configurations, this.formShorteningEnabled, this.isDevelopmentMode );}
 	
 	// Listen for ZI API matches.
-	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm(data);}
+	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm( data, this.formShorteningEnabled );}
 
 	// Antiflicker.
 	//!!! At present, this only applies in the doc, not inside iframes.
