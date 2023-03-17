@@ -114,7 +114,9 @@
 			
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
 			if (formShorteningEnabled) {
-				data.inputs.forEach((input) => {this.readyField(this.context.querySelector(data.formSelector+' '+input), data);});
+				const field = this.context.querySelector(data.formSelector+' '+input);
+				if (!field) {console.warn('Unable to find field', data.formSelector, input);}
+				data.inputs.forEach((input) => {this.readyField(field, data);});
 			}
 
 			// Remove Antiflicker.
@@ -129,7 +131,9 @@
 			
 			console.log('ZI - Updating form...');
 
-			data.inputs.forEach((input) => {this.updateField(this.context.querySelector(data.formSelector+' '+input), data);});
+			const field = this.context.querySelector(data.formSelector+' '+input);
+			if (!field) {console.warn('Unable to find field', data.formSelector, input);}
+			data.inputs.forEach((input) => {this.updateField( field, data );});
 
 		}
 
