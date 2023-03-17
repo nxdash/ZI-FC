@@ -31,7 +31,7 @@
 		
 		constructor( data, configurations, formShorteningEnabled, isDevelopementMode ) {
 			
-			console.log('ZI - Constructing form object...', data, configurations);
+			console.log('ZI - Constructing form object...', data, configurations, formShorteningEnabled, isDevelopementMode );
 			
 			// Developer Mode?
 			if (isDevelopementMode) {Notification = new ZI_Notification('Developer Mode enabled for FormComplete.');}
