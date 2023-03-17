@@ -118,7 +118,7 @@
 			if (formShorteningEnabled) {
 				data.inputs.forEach(function(input){
 					this.readyField(this.context.querySelector(data.formSelector+' '+input));
-				}.bind(this));
+				}.bind( this, data ));
 			}
 
 			// Remove Antiflicker.
@@ -133,7 +133,7 @@
 			
 			data.inputs.forEach(function(input){
 				this.updateField( this.context.querySelector(data.formSelector+' '+input), input, data );
-			}.bind(this));
+			}.bind( this, data ));
 			
 		}
 
