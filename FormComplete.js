@@ -117,7 +117,8 @@
 				data.inputs.forEach(function(input){
 					
 					
-					console.warn('--BREAKPOINT--', this.context, data.formSelector, input );
+					console.warn('--BREAKPOINT--', data.formSelector );
+					console.warn('--BREAKPOINT--', input );
 					
 					this.readyField(this.context.querySelector(data.formSelector+' '+input));
 				}.bind( this, data ));
