@@ -15,7 +15,7 @@
 	 *     text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
 	 *   
 	 */
-	var configurations = {
+	const configurations = {
 		dynamic: false,  // set to true if form does not exist imediatly in document.
 		formSelector: '#example1',
 		formContainer: 'body',
@@ -30,6 +30,8 @@
 	class ZI_Form {
 		
 		constructor( data, configurations, formShorteningEnabled, isDevelopementMode ) {
+			
+			console.warn(configurations);
 			
 			console.log('ZI - Constructing form object...', data, configurations, formShorteningEnabled, isDevelopementMode );
 			
