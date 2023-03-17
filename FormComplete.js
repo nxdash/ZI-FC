@@ -116,7 +116,7 @@
 			if (formShorteningEnabled) {
 
 				data.inputs.forEach((input) => {
-					const field = this.context.querySelector(data.formSelector+' '+input);
+					const field = this.context.querySelector( data.formSelector + ' '+ input );
 					if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
 					this.readyField(field, data);
 				});
@@ -152,7 +152,7 @@
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
 			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
 			const isEmail = ['id', 'name', 'class'].some(identifier => field[identifier] && field[identifier].includes('email') || field.classList.contains('email'));
-			const isExcluded = excludedFields.includes(field.id) || excludedFields.includes(field.name) || field.classList.contains(excludedFields);
+			const isExcluded = this.configurations.excludedFields.includes(field.id) || this.configurations.excludedFields.includes(field.name) || field.classList.contains(this.configurations.excludedFields);
 
 			if (isField && !ignoredType && !isEmail && !isExcluded) {
 				const fieldContainer = this.findContainer(field);
@@ -181,7 +181,7 @@
 			// Analyze field.
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
 			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
-			const isExcluded = excludedFields.includes(field.id) || excludedFields.includes(field.name) || field.classList.contains(excludedFields);
+			const isExcluded = this.configurations.excludedFields.includes(field.id) || this.configurations.excludedFields.includes(field.name) || field.classList.contains(this.configurations.excludedFields);
 
 			// Field was not populated and is not excluded, display it.
 			if ( isField && !ignoredType && !isExcluded ) {fieldContainer.style.display = '';}
