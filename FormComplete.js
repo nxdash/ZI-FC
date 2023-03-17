@@ -33,6 +33,9 @@
 			
 			console.log('ZI - Constructing form object...', data, configurations);
 			
+			// Developer Mode?
+			if (isDevelopementMode) {Notification = new ZI_Notification('Developer Mode enabled for FormComplete.');}
+			
 			// Store configurations.
 			this.configurations = configurations;
 
@@ -40,7 +43,7 @@
 			this.context = this.getContext(data.formSelector);
 			
 			// Dynamic enabled?
-			if (this.configurations['dynamic']) {
+			if (this.configurations.dynamic) {
 				
 				// Define Mutation Observer 
 				const formWatch = function(mutationsList, observer) {
@@ -49,10 +52,10 @@
 							for (const e of mutation.addedNodes) {
 								if (e.tagName.toLowerCase() === 'form') {
 									
-									console.log('ZI - Form added to ' + this.configurations['formContainer'] + '.');
+									console.log('ZI - Form added to ' + this.configurations.formContainer + '.');
 
 									// Maybe check here... data.formSelector == e.id || ...
-									this.readyForm(data);
+									this.readyForm( data, formShorteningEnabled );
 									
 									// Stop observer.
 									observer.disconnect();
@@ -63,7 +66,7 @@
 					}
 				};
 				
-				const watchContainer = this.context.querySelector(this.configurations['formContainer']);// using form context... hope things play nice...
+				const watchContainer = this.context.querySelector(this.configurations.formContainer);// using form context... hope things play nice...
 				if ( watchContainer !== null ) {
 
 					// Create observer instance linked to formWatch callback
@@ -74,14 +77,14 @@
 
 				} else {
 
-					console.log('ZI - Form container ('+ this.configurations['formContainer'] +') not found. Recommended default: body');
+					console.warn('ZI - Form container ('+ this.configurations.formContainer +') not found. Recommended default: body');
 
 				}
 
 			} else {
 			
 				// Ready form.
-				this.readyForm(data);
+				this.readyForm( data, formShorteningEnabled );
 			
 			}
 
@@ -105,15 +108,13 @@
 		}
 
 		// Ready form when form is loaded.
-		readyForm(data) {
+		readyForm( data, formShorteningEnabled ) {
 			
 			console.log('ZI - Readying form...');
 			
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
-			
-			data.inputs.forEach(function(input){this.readyField(this.context.querySelector(data.formSelector+' '+input));});
-			document.getElementById('ZI_AF').remove();// Remove Antiflicker style.
-			//this.context.getElementById('ZI_AF').remove();// Remove Antiflicker style.  !! At present, style is only populated in primary context, and not in iframes if that is where form resides.
+			if (formShorteningEnabled) {data.inputs.forEach(function(input){this.readyField(this.context.querySelector(data.formSelector+' '+input));});}
+			this.context.getElementById('ZI_AF').remove();// Remove Antiflicker style.
 			
 		}
 		
@@ -137,7 +138,7 @@
 			if (isField && !ignoredType && !isEmail && !isExcluded) {
 				const fieldContainer = this.findContainer(field);
 				if (fieldContainer) {fieldContainer.style.display = 'none';}
-				else {console.log('ZI - Field Container not found.', field);}
+				else {console.warn('ZI - Field Container not found.', field);}
 			}
 			
 		}
@@ -151,7 +152,7 @@
 			// Find field container.
 			const fieldContainer = findContainer(field);
 			if (!fieldContainer) {
-				console.log('ZI - Field Container not found.', field);
+				console.warn('ZI - Field Container not found.', field);
 				return;
 			}
 
@@ -172,41 +173,45 @@
 
 	// Notification Class.
 	class ZI_Notification {
-		
-		/*
-		
-			isDevelopementMode boolean
-		
-		*/
-		
-		constructor( type, message ) {
 			
+		constructor( message ) {
+
+			// Create notification style
+			const notifyStyle = document.createElement('style');
+			notifyStyle.id = 'ZI_NS';
+			notifyStyle.innerHTML = '<style>#ZI_N {animation:ZI_N_Fade 6s;background-color:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.2);border-radius:4px;box-sizing:border-box;display:inline-block;font:11px Verdana;opacity:0;padding:10px;position:fixed;right:20px;top:0px;z-index:1;}@keyframes ZI_N_Fade {0% {opacity:0;top:0px;} 20%,80%	{opacity:1;top:20px;} 100% {opacity:0;top:0px;}}</style>';
+			document.head.appendChild(notifyStyle);
 			
+			// Create notification object
+			const notifyObject = document.createElement('div');
+			notifyObject.id = 'ZI_N';
+			notifyObject.innerHTML = '<div id="ZI_N">'+ message +'</div>';
+			document.body.appendChild(notifyObject);
 			
+			// Remove both elements after 5 seconds.
+			setTimeout(() => {
+				document.getElementById('ZI_N').remove();
+				document.getElementById('ZI_NS').remove();
+			}, 5000);
+
 		}
-		
-		
-		
+
 	}
 
     // Ensure fc variable is initialized.
     if(!window._zi_fc){window._zi_fc = {};}
 	
 	// Initialize when ready.
-	window._zi_fc.onReady = function( data, configurations ) {
-		ZI_Form = new ZI_Form( data, configurations, this.formShorteningEnabled, this.isDevelopementMode );
-	}
+	window._zi_fc.onReady = function( data, configurations ) {ZI_Form = new ZI_Form( data, configurations, this.formShorteningEnabled, this.isDevelopementMode );}
 	
 	// Listen for ZI API matches.
-	window._zi_fc.onMatch = function(data) {
-		ZI_Forms.updateForm(data);
-	}
+	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm(data);}
 
 	// Antiflicker.
 	//!!! At present, this only applies in the doc, not inside iframes.
 	const s = document.createElement('style');
 	s.id = 'ZI_AF';
-	s.innerHTML = `${configurations['formSelector']} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
+	s.innerHTML = `${configurations.formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
 	document.head.appendChild(s);
 	
 	// Add base logic once document has loaded.
