@@ -2,7 +2,7 @@
 	
 	/** Configurations
 	 *  
-	 *   dynamic
+	 *   dynamicForm
 	 *     boolean; if true, we will observe the formContainer element and wait for the form to be created. Not needed if form exist in DOM at load.
 	 *  
 	 *   formSelector
@@ -16,7 +16,7 @@
 	 *   
 	 */
 	const configurations = {
-		dynamic: false,  // set to true if form does not exist imediatly in document.
+		dynamicForm: false,  // set to true if form does not exist imediatly in document.
 		formSelector: '#example1',
 		formContainer: 'body',
 		excludedFields: ['name2', 'notreal']  // id, name or class
@@ -45,7 +45,7 @@
 			this.context = this.getContext(data.formSelector);
 			
 			// Dynamic enabled?
-			if (this.configurations.dynamic) {
+			if (this.configurations.dynamicForm) {
 				
 				// Define Mutation Observer 
 				const formWatch = function(mutationsList, observer) {
