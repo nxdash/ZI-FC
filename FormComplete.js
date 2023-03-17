@@ -115,8 +115,14 @@
 			console.log('ZI - Readying form...');
 			
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
-			if (formShorteningEnabled) {data.inputs.forEach(function(input){this.readyField(this.context.querySelector(data.formSelector+' '+input));});}
-			this.context.getElementById('ZI_AF').remove();// Remove Antiflicker style.
+			if (formShorteningEnabled) {
+				data.inputs.forEach(function(input){
+					this.readyField(this.context.querySelector(data.formSelector+' '+input));
+				}.bind(this));
+			}
+
+			// Remove Antiflicker.
+			this.context.getElementById('ZI_AF').remove();
 			
 		}
 		
@@ -124,7 +130,10 @@
 		updateForm(data) {
 			
 			console.log('ZI - Updating form...');
-			data.inputs.forEach(function(input){this.updateField( this.context.querySelector(data.formSelector+' '+input), input, data );});
+			
+			data.inputs.forEach(function(input){
+				this.updateField( this.context.querySelector(data.formSelector+' '+input), input, data );
+			}.bind(this));
 			
 		}
 
