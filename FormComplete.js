@@ -29,14 +29,12 @@
 	// Form Class.
 	class ZI_Form {
 		
-		constructor( data, configurations, formShorteningEnabled, isDevelopementMode ) {
-			
-			console.warn(configurations);
-			
-			console.log('ZI - Constructing form object...', data, configurations, formShorteningEnabled, isDevelopementMode );
+		constructor( data, configurations, formShorteningEnabled, isDevelopmentMode ) {
+
+			console.log('ZI - Constructing form object...', data, configurations, formShorteningEnabled, isDevelopmentMode );
 			
 			// Developer Mode?
-			if (isDevelopementMode) {Notification = new ZI_Notification('Developer Mode enabled for FormComplete.');}
+			if (isDevelopmentMode) {Notification = new ZI_Notification('Developer Mode enabled for FormComplete.');}
 			
 			// Store configurations.
 			this.configurations = configurations;
@@ -213,7 +211,7 @@
     if(!window._zi_fc){window._zi_fc = {};}
 	
 	// Initialize when ready.
-	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.configurations, this.formShorteningEnabled, this.isDevelopementMode );}
+	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.configurations, this.formShorteningEnabled, this.isDevelopmentMode );}
 	
 	// Listen for ZI API matches.
 	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm(data);}
