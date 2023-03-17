@@ -114,9 +114,7 @@
 			
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
 			if (formShorteningEnabled) {
-				data.inputs.forEach(function(input){
-					this.readyField(this.context.querySelector(data.formSelector+' '+input), data);
-				}.bind(this, input));
+				data.inputs.forEach((input) => {this.readyField(this.context.querySelector(data.formSelector+' '+input), data);});
 			}
 
 			// Remove Antiflicker.
@@ -131,9 +129,7 @@
 			
 			console.log('ZI - Updating form...');
 
-			data.inputs.forEach(function(input){
-				this.updateField(this.context.querySelector(data.formSelector+' '+input), data);
-			}.bind(this, input));
+			data.inputs.forEach((input) => {this.updateField(this.context.querySelector(data.formSelector+' '+input), data);});
 
 		}
 
