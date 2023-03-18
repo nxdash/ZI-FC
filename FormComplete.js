@@ -15,10 +15,11 @@
 	 *     text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
 	 *   
 	 */
-	window.configurations = {
+	window.ZIConfigurations = {
 		dynamicForm: false,  // set to true if form does not exist imediatly in document.
 		formSelector: '#example1',
 		formContainer: 'body',
+		fieldContainer: '',
 		excludedFields: ['name2', 'notreal']  // id, name or class
 	}
 	
@@ -107,6 +108,35 @@
 			
 		}
 
+		// Find the field containing element.
+		findContainer(e) {
+			
+			const fieldContainer = window.configurations.fieldContainer;
+			const p = e.parentElement;
+
+			// If parent is null, findContainer reached top of DOM, do not use as container.
+			if (!p) {return false;}
+
+			// Was fieldContainer configuration set?
+			if (fieldContainer.length !== 0) {
+
+				if (
+					(fieldContainerExact && ['id', 'name', 'class'].some(identifier => p[identifier] === fieldContainer || p.getAttribute('class').toString().trim() == fieldContainer)) || // Check if fieldContainer value matches the ID, Name or Class. 
+					(!fieldContainerExact && ['id', 'name', 'class'].some(identifier => p.hasOwnProperty(identifier) && p[identifier] && p[identifier].includes(fieldContainer) || p.classList.contains(fieldContainer))) // Check if fieldContainer value is present in ID, Name or Class.
+				) {return p;}
+
+				return this.findContainer(p);
+
+			} else {
+				
+				// Hide the furthest parent node from the field with a single child element, excluding label.
+				const c = p.children, n = c.length;
+				if (n == 1 || (n == 2 && c[0].tagName.toLowerCase() == 'label')) {return this.findContainer(p);}
+				return e;
+			}
+			
+		}
+
 		// Ready form when form is loaded.
 		readyForm( data, formShorteningEnabled ) {
 			
@@ -169,7 +199,7 @@
 			if ( data[input] != undefined ) {return;}
 
 			// Find field container.
-			const fieldContainer = findContainer(field);
+			const fieldContainer = this.findContainer(field);
 			if (!fieldContainer) {
 				console.warn('ZI - Field Container not found.', field);
 				return;
@@ -196,52 +226,54 @@
 		constructor( message ) {
 
 			// Create notification style
-			const notifyStyle = document.createElement('style');
-			notifyStyle.id = 'ZI_NS';
-			notifyStyle.innerHTML = '<style>#ZI_N {animation:ZI_N_Fade 6s;background-color:rgba(0,0,0,0.1);border:1px solid rgba(0,0,0,0.2);border-radius:4px;box-sizing:border-box;display:inline-block;font:11px Verdana;opacity:0;padding:10px;position:fixed;right:20px;top:0px;z-index:1;}@keyframes ZI_N_Fade {0% {opacity:0;top:0px;} 20%,80%	{opacity:1;top:20px;} 100% {opacity:0;top:0px;}}</style>';
-			document.head.appendChild(notifyStyle);
+			var zins = document.createElement('style');
+			(zins.id = 'ZI_NS'),
+			(zins.innerHTML = '#ZI_N {animation:ZI_N_Fade 6s;background-color:#FFFFFF;border:1px solid #DDDDDD;border-radius:4px;box-sizing:border-box;display:inline-block;font:11px Verdana;opacity:0;padding:14px;position:fixed;right:20px;top:0px;z-index:1;}@keyframes ZI_N_Fade {0% {opacity:0;top:0px;} 20%,80%	{opacity:1;top:20px;} 100% {opacity:0;top:0px;}}'),
+			document.head.appendChild(zins);
 			
 			// Create notification object
-			const notifyObject = document.createElement('div');
-			notifyObject.id = 'ZI_N';
-			notifyObject.innerHTML = '<div id="ZI_N">'+ message +'</div>';
-			document.body.appendChild(notifyObject);
+			var zino = document.createElement('div');
+			(zino.id = 'ZI_N'),
+			(zino.innerHTML = '<div id="ZI_N">'+ message +'</div>'),
+			document.body.appendChild(zino);
 			
 			// Remove both elements after 5 seconds.
 			setTimeout(() => {
-				document.getElementById('ZI_N').remove();
-				document.getElementById('ZI_NS').remove();
+				document.getElementById('zino').remove();
+				document.getElementById('zins').remove();
 			}, 5000);
 
 		}
 
 	}
 
-    // Ensure fc variable is initialized.
+    // Initialize if needed.
     if(!window._zi_fc){window._zi_fc = {};}
 	
 	// Initialize when ready.
-	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.configurations, this.formShorteningEnabled, this.isDevelopmentMode );}
+	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.ZIConfigurations, this.formShorteningEnabled, this.isDevelopmentMode );}
 	
 	// Listen for ZI API matches.
 	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm( data, this.formShorteningEnabled );}
+
+
+
+
 
 	// Antiflicker.
 	//!!! At present, this only applies in the doc, not inside iframes.
 	const s = document.createElement('style');
 	s.id = 'ZI_AF';
-	s.innerHTML = `${configurations.formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
+	s.innerHTML = `${window.ZIConfigurations.formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
 	document.head.appendChild(s);
 	
-	// Add base logic once document has loaded.
+	// Create and load Tag.
 	document.addEventListener('DOMContentLoaded', function() {
-
 		var zi = document.createElement('script');
 		(zi.type = 'text/javascript'),
 		(zi.async = true),
 		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
 		document.body.appendChild(zi);
-	
 	}, { once:true, capture:true });
 	
 	console.log('ZI - FormComplete snippet loaded.');
