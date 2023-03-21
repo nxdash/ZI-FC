@@ -248,7 +248,10 @@
 		document.body.appendChild(zi);
 
 		// Remove Antiflicker - Fallback.
-		setTimeout( function(){document.getElementById('ZI_AF').remove();}, 1500 );
+		setTimeout( function(){
+			const ZI_AF = document.getElementById('ZI_AF');
+			if (ZI_AF){ZI_AF.remove();}
+		}, 1500 );
 
 	}, { once:true, capture:true });
 	
