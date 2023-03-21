@@ -147,7 +147,7 @@
 				data.inputs.forEach((input) => {
 					const field = this.context.querySelector( data.formSelector + ' '+ input );
 					if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
-					this.readyField(field, data);
+					this.readyField(field);
 				});
 			}
 
@@ -166,7 +166,7 @@
 			data.inputs.forEach((input) => {
 				const field = this.context.querySelector(data.formSelector+' '+input);
 				if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
-				this.updateField( field, data );
+				this.updateField( field, input, data );
 				
 			});
 
