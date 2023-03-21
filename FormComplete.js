@@ -147,7 +147,7 @@
 				data.inputs.forEach((input) => {
 					const field = this.context.querySelector( data.formSelector + ' '+ input );
 					if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
-					this.readyField(field);
+					this.readyField( field, input, data );
 				});
 			}
 
@@ -173,9 +173,9 @@
 		}
 
 		// Hide mapped field that is not email nor an excluded field in configurations.
-		readyField(field) {
+		readyField( field, input, data ) {
 			
-			console.log('ZI - Readying Field.', field);
+			console.log('ZI - Readying Field.', field, input, data );
 			
 			// Analyze field.
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
@@ -194,6 +194,8 @@
 		// Update mapped field that is not email nor an excluded field in configurations. If an element is hidden by end-user and is excluded, we will not unhide element spite it being hidden + unpopulated with data, end-user will need to unhide with their own logic if excluded. 
 		updateField( field, input, data ) {
 			
+			console.log('ZI - Updating Field.', field, input, data );
+
 			// If field populated, ignore.
 			if ( data[input] != undefined ) {return;}
 
@@ -234,16 +236,20 @@
 	(s.innerHTML = `${window.ZIConfigurations.formSelector} {opacity:0 !important;}`),
 	document.head.appendChild(s);
 	
-	// Remove Antiflicker - Fallback.
-	setTimeout( function(){document.getElementById('ZI_AF').remove();}, 1500 );
 	
-	// Create and load Tag.
+	// Wait for content to complete loading.
 	document.addEventListener('DOMContentLoaded', function() {
+
+		// Load FormComplete logic.
 		var zi = document.createElement('script');
 		(zi.type = 'text/javascript'),
 		(zi.async = true),
 		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
 		document.body.appendChild(zi);
+
+		// Remove Antiflicker - Fallback.
+		setTimeout( function(){document.getElementById('ZI_AF').remove();}, 1500 );
+
 	}, { once:true, capture:true });
 	
 	console.log('ZI - FormComplete snippet loaded.');
