@@ -2,17 +2,18 @@
 	
 	/** Configurations
 	 *  
-	 *   dynamicForm
-	 *     boolean; if true, we will observe the formContainer element and wait for the form to be created. Not needed if form exist in DOM at load.
-	 *  
 	 *   formSelector
-	 *     query selector value, example #FormID, .FormClass, Form[Attribute=Value]; This is used to locate the form within a document.
+	 *		query selector value, example #FormID, .FormClass, Form[Attribute=Value]; This is used to locate the form within a document.
+	 *		This value must be populated if form flicker is occuring.
+	 *  
+	 *   dynamicForm
+	 *		boolean; Does the form not exist when the page initially loads? If true, we can apply our logic automatically when the form appears within the formContainer element.
 	 *  
 	 *   formContainer
-	 *     query selector value, example #FormContainerID, .FormContainerClass, FormContainer[Attribute=Value]; This is used to locate the form container within a document. This is only needed if 'dynamic' is true. Default value: body.
+	 *		query selector value, example #FormContainerID, .FormContainerClass, FormContainer[Attribute=Value]; Only used if dynamicForm is true. We will observe this element until the desired form has loaded.
 	 *  
 	 *   excludedFields
-	 *     text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
+	 *		text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
 	 *   
 	 */
 	window.ZIConfigurations = {
@@ -30,12 +31,9 @@
 	// Form Class.
 	class ZI_Form {
 		
-		constructor( data, configurations, formShorteningEnabled, isDevelopmentMode ) {
+		constructor( data, configurations, formShorteningEnabled ) {
 
-			console.log('ZI - Constructing form object...', data, configurations, formShorteningEnabled, isDevelopmentMode );
-			
-			// Developer Mode?
-			if (isDevelopmentMode) {Notification = new ZI_Notification('Developer Mode enabled for FormComplete.');}
+			console.log('ZI - Initializing...', data, configurations, formShorteningEnabled );
 			
 			// Store configurations.
 			this.configurations = configurations;
@@ -82,7 +80,8 @@
 
 				}
 
-			} else {
+			}
+			else {
 			
 				// Ready form.
 				this.readyForm( data, formShorteningEnabled );
@@ -111,7 +110,7 @@
 		// Find the field containing element.
 		findContainer(e) {
 			
-			const fieldContainer = window.configurations.fieldContainer;
+			const fieldContainer = window.ZIConfigurations.fieldContainer;
 			const p = e.parentElement;
 
 			// If parent is null, findContainer reached top of DOM, do not use as container.
@@ -140,7 +139,7 @@
 		// Ready form when form is loaded.
 		readyForm( data, formShorteningEnabled ) {
 			
-			console.log('ZI - Readying form...');
+			console.log('ZI - Readying Form.');
 			
 			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
 			if (formShorteningEnabled) {
@@ -176,7 +175,7 @@
 		// Hide mapped field that is not email nor an excluded field in configurations.
 		readyField(field) {
 			
-			console.log('ZI Field', field);
+			console.log('ZI - Readying Field.', field);
 			
 			// Analyze field.
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
@@ -220,35 +219,8 @@
 		
 	}
 
-	// Notification Class.
-	class ZI_Notification {
-			
-		constructor( message ) {
-
-			// Create notification style
-			var zins = document.createElement('style');
-			(zins.id = 'ZI_NS'),
-			(zins.innerHTML = '#ZI_N {animation:ZI_N_Fade 6s;background-color:#FFFFFF;border:1px solid #DDDDDD;border-radius:4px;box-sizing:border-box;display:inline-block;font:11px Verdana;opacity:0;padding:14px;position:fixed;right:20px;top:0px;z-index:1;}@keyframes ZI_N_Fade {0% {opacity:0;top:0px;} 20%,80%	{opacity:1;top:20px;} 100% {opacity:0;top:0px;}}'),
-			document.head.appendChild(zins);
-			
-			// Create notification object
-			var zino = document.createElement('div');
-			(zino.id = 'ZI_N'),
-			(zino.innerHTML = '<div id="ZI_N">'+ message +'</div>'),
-			document.body.appendChild(zino);
-			
-			// Remove both elements after 5 seconds.
-			setTimeout(() => {
-				document.getElementById('zino').remove();
-				document.getElementById('zins').remove();
-			}, 5000);
-
-		}
-
-	}
-
-    // Initialize if needed.
-    if(!window._zi_fc){window._zi_fc = {};}
+    // Initialize FormComplete Global.
+    window._zi_fc = {};
 	
 	// Initialize when ready.
 	window._zi_fc.onReady = function(data) {ZI_Form = new ZI_Form( data, window.ZIConfigurations, this.formShorteningEnabled, this.isDevelopmentMode );}
@@ -256,16 +228,14 @@
 	// Listen for ZI API matches.
 	window._zi_fc.onMatch = function(data) {ZI_Forms.updateForm( data, this.formShorteningEnabled );}
 
-
-
-
-
 	// Antiflicker.
-	//!!! At present, this only applies in the doc, not inside iframes.
 	const s = document.createElement('style');
-	s.id = 'ZI_AF';
-	s.innerHTML = `${window.ZIConfigurations.formSelector} {opacity:0 !important;}`;// The CSS to be loaded which dynamically will populate the form selector.
+	(s.id = 'ZI_AF'),
+	(s.innerHTML = `${window.ZIConfigurations.formSelector} {opacity:0 !important;}`),
 	document.head.appendChild(s);
+	
+	// Remove Antiflicker - Fallback.
+	setTimeout( function(){document.getElementById('ZI_AF').remove();}, 1500 );
 	
 	// Create and load Tag.
 	document.addEventListener('DOMContentLoaded', function() {
