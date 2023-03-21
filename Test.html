@@ -52,9 +52,8 @@
 			<input id="email" value="Email"><br><input id="name" value="Name"><br>
 			<input id="company" value="Company"><br>
 			<select id="country">
-				<option value="1">USA</option>
-				<option value="2">Japan</option>
-				<option value="3">Canada</option>
+				<option value="US">USA</option>
+				<option value="CA">Canada</option>
 			</select><br>
 			<input type="button" value="Continue">
 			`;
@@ -62,14 +61,6 @@
 		},2000);
 	
 	</script>
-	<!--/
-	
-		This script must do the following:
-			Hide form elements (including any container items) that are not excluded and exclude any element that contains 'email' in the id/name/class value.
-			prevent flickering of the form as items are hidden
-			have unhide functionality when receiving a json response from the endpoint that returns a value for a field
-			has the added option to also hide the field (check if the field is already hidden, and if so, add to ignore list)
-	/-->
 </head>
 <body>
 
@@ -79,9 +70,8 @@
 		<input name="name" value="Name"><br>
 		<input name="company" value="Company"><br>
 		<select name="country">
-			<option value="1">USA</option>
-			<option value="2">Japan</option>
-			<option value="3">Canada</option>
+			<option value="US">USA</option>
+			<option value="CA">Canada</option>
 		</select><br>
 		<input type="button" value="Continue">
 	</form>
@@ -107,9 +97,8 @@
 		<div>
 			<label for="country2">Country</label>
 			<select name="country2">
-				<option value="1">USA</option>
-				<option value="2">Japan</option>
-				<option value="3">Canada</option>
+				<option value="US">USA</option>
+				<option value="CA">Canada</option>
 			</select>
 		</div>
 
@@ -150,9 +139,8 @@
 			<div>
 				<label for="country2">Country</label>
 				<select name="country2">
-					<option value="1">USA</option>
-					<option value="2">Japan</option>
-					<option value="3">Canada</option>
+					<option value="US">USA</option>
+					<option value="CA">Canada</option>
 				</select>
 				<span class="instructions"><span>
 			</div>
