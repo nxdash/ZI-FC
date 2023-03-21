@@ -159,9 +159,9 @@
 		// Update form when a match is found by ZI API.
 		updateForm( data, formShorteningEnabled ) {
 			
+			console.log('ZI - Updating form...', data, formShorteningEnabled );
+
 			if (!formShorteningEnabled) {return;}
-			
-			console.log('ZI - Updating form...');
 
 			data.inputs.forEach((input) => {
 				const field = this.context.querySelector(data.formSelector+' '+input);
