@@ -228,7 +228,7 @@
 	window._zi_fc.onReady = function(data) {window.ZI_Form = new ZI_Form( data, window.ZIConfigurations, this.formShorteningEnabled, this.isDevelopmentMode );}
 	
 	// Listen for ZI API matches.
-	window._zi_fc.onMatch = function(data) {window.ZI_Forms.updateForm( data, this.formShorteningEnabled );}
+	window._zi_fc.onMatch = function(data) {window.ZI_Form.updateForm( data, this.formShorteningEnabled );}
 
 	// Antiflicker.
 	const s = document.createElement('style');
