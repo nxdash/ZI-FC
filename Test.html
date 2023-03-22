@@ -46,15 +46,39 @@
 		// Create a form dynamically to test mutation lisenter.
 		setTimeout(function(){
 			const form = document.createElement('form');
-			form.id = 'example4';
+			form.id = 'example1';
 			form.innerHTML = `
-			<h3>Example 4: Dynamic form, no field containers or labels. Does not exist in DOM @ load completion</h3>
-			<input id="email" value="Email"><br><input id="name" value="Name"><br>
-			<input id="company" value="Company"><br>
-			<select id="country">
-				<option value="US">USA</option>
-				<option value="CA">Canada</option>
-			</select><br>
+			<h3>Dynamic form, label + span + no attribute div  + div container with class. Does not exist in DOM @ load completion</h3>
+			<div class="fieldx">
+				<div>
+					<label for="email">Email</label>
+					<input name="email" value="Email">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldx">
+				<div>
+					<label for="name">Name</label>
+					<input name="name" value="Never Exclude">
+					<span class="instructions"></span>
+				</div>
+				<span class="notes"></span>
+			</div>
+			<div class="fieldx">
+				<div>
+					<label for="company">Company</label>
+					<input name="company" value="Company">
+					<span class="instructions"></span>
+				</div>
+				<span class="notes"></span>
+			</div>
+			<div class="fieldx">
+				<div>
+					<label for="country">Country</label>
+					<input name="country" value="">
+					<span class="instructions"></span>
+				</div>
+			</div>
 			<input type="button" value="Continue">
 			`;
 			document.body.appendChild(form);
@@ -64,77 +88,31 @@
 </head>
 <body>
 
-	<form id="example1">
-		<h3>Example 1: Basic form, no field containers or labels.</h3>
-		<input name="email" value="Email"><br>
-		<input name="name" value="Name"><br>
-		<input name="company" value="Company"><br>
-		<select name="country">
-			<option value="Unitied States">USA</option>
-			<option value="Canada">Canada</option>
-		</select><br>
-		<input type="button" value="Continue">
-	</form>
-
-
 	<form id="example2">
-		<h3>Example 2: Simple form, label + no attribute div container.</h3>
-		<div>
-			<label for="email2">Email</label>
-			<input name="email2" value="Email">
-		</div>
-
-		<div>
-			<label for="name2">Name</label>
-			<input name="name2" value="Never Exclude">
-		</div>
-
-		<div>
-			<label for="company2">Company</label>
-			<input name="company2" value="Company">
-		</div>
-
-		<div>
-			<label for="country2">Country</label>
-			<select name="country2">
-				<option value="Unitied States">Unitied States</option>
-				<option value="Canada">Canada</option>
-			</select>
-		</div>
-
-		<input type="button" value="Continue">
-
-	</form>
-
-
-	<form id="example3">
-		<h3>Example 3: Simple form, label + span + no attribute div  + div container with class.</h3>
+		<h3>Simple form, label + span + no attribute div  + div container with class.</h3>
 		<div class="fieldx">
 			<div>
 				<label for="email2">Email</label>
 				<input name="email2" value="Email">
-				<span class="instructions"><span>
+				<span class="instructions"></span>
 			</div>
 		</div>
-
 		<div class="fieldx">
 			<div>
 				<label for="name2">Name</label>
 				<input name="name2" value="Never Exclude">
-				<span class="instructions"><span>
+				<span class="instructions"></span>
 			</div>
-			<span class="notes"><span>
+			<span class="notes"></span>
 		</div>
-
 		<div class="fieldx">
 			<div>
 				<label for="company2">Company</label>
 				<input name="company2" value="Company">
-				<span class="instructions"><span>
+				<span class="instructions"></span>
 			</div>
-			<span class="notes"><span>
+			<span class="notes"></span>
 		</div>
-
 		<div class="fieldx">
 			<div>
 				<label for="country2">Country</label>
@@ -142,12 +120,10 @@
 					<option value="Unitied States">USA</option>
 					<option value="Canada">Canada</option>
 				</select>
-				<span class="instructions"><span>
+				<span class="instructions"></span>
 			</div>
 		</div>
-
 		<input type="button" value="Continue">
-
 	</form>
 
 </body>
