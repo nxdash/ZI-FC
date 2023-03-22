@@ -20,23 +20,24 @@
 		dynamicForm: false,  // set to true if form does not exist imediatly in document.
 		formSelector: '#example1',
 		formContainer: 'body',
-		fieldContainer: '',
+		fieldContainer: 'fieldx',
 		excludedFields: ['name2', 'notreal']  // id, name or class
 	}
 	
 	// Project key. Get this value from FormComplete.
 	window.ZIProjectKey = "0281657f921669107410"; 
 
-
 	// Form Class.
 	class ZI_Form {
 		
 		constructor( data, configurations, formShorteningEnabled ) {
 
-			console.log('ZI - Initializing...', data, configurations, formShorteningEnabled );
+			console.log('ZI - Initializing...');
 			
 			// Store configurations.
 			this.configurations = configurations;
+			this.formShorteningEnabled = formShorteningEnabled;
+			this.formInputs = [];
 
 			// Store context where form resides. This searches sourceless iframes as well.
 			this.context = this.getContext(data.formSelector);
@@ -91,14 +92,15 @@
 		}
 
 		// Get context for form.
-		getContext(selector) {
+		getContext(e) {
 			
 			// formIframeWrapperSelector "iframe.hs-form-iframe"
 			
+			// !!! Will need to update logic to handle any iframes Current logic only for HubSpot iframes.
 			var iframes = document.getElementsByClassName('hs-form-iframe');
 			if(iframes) {
 				for( var i=0; i < iframes.length; i+=1 ) {
-					if( iframes[i].contentDocument.querySelector(selector) )
+					if( iframes[i].contentDocument.querySelector(e) )
 						return iframes[i].contentDocument;
 				}
 			}
@@ -116,127 +118,136 @@
 			// If parent is null, findContainer reached top of DOM, do not use as container.
 			if (!p) {return false;}
 
-			// Was fieldContainer configuration set?
+			// Was fieldContainer set?
 			if (fieldContainer.length !== 0) {
-
-				if (
-					(fieldContainerExact && ['id', 'name', 'class'].some(identifier => p[identifier] === fieldContainer || p.getAttribute('class').toString().trim() == fieldContainer)) || // Check if fieldContainer value matches the ID, Name or Class. 
-					(!fieldContainerExact && ['id', 'name', 'class'].some(identifier => p.hasOwnProperty(identifier) && p[identifier] && p[identifier].includes(fieldContainer) || p.classList.contains(fieldContainer))) // Check if fieldContainer value is present in ID, Name or Class.
-				) {return p;}
-
-				return this.findContainer(p);
-
-			} else {
 				
-				// Hide the furthest parent node from the field with a single child element, excluding label.
-				const c = p.children, n = c.length;
-				if (n == 1 || (n == 2 && c[0].tagName.toLowerCase() == 'label')) {return this.findContainer(p);}
-				return e;
+				// Check if fieldContainer value is present in ID, Name or Class.
+				if (['id', 'name', 'class'].some(identifier => p.hasOwnProperty(identifier) && p[identifier] && p[identifier].includes(fieldContainer) || p.classList.contains(fieldContainer))) {return p;}
+
+				// Recursively look for container and return results if found.
+				const x = this.findContainer(p);
+				if (x){return x;}
+
 			}
+			
+			// No field container set. Hide field only.
+			return e;
 			
 		}
 
-		// Ready form when form is loaded.
-		readyForm( data, formShorteningEnabled ) {
+		// Ready form.
+		readyForm(data) {
 			
-			console.log('ZI - Readying Form.');
-			
-			// Is formShorteningEnabled true? If so, continue, otherwise just remove Antiflicker.
-			if (formShorteningEnabled) {
+			// Is form shortening enabled?
+			if (this.formShorteningEnabled) {
 
+				// Ready each field that can be found using mapped selectors.
 				data.inputs.forEach((input) => {
 					const field = this.context.querySelector( data.formSelector + ' '+ input );
-					if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
-					this.readyField( field, input, data );
+					if (!field) {console.warn('ZI - Unable to find field', data.formSelector, input);}
+					else {this.readyField( field, input );}
 				});
+
 			}
 
 			// Remove Antiflicker.
 			this.context.getElementById('ZI_AF').remove();
 			
+			console.log('ZI - Ready.');
+			
 		}
 		
-		// Update form when a match is found by ZI API.
-		updateForm( data, formShorteningEnabled ) {
+		// Update form when match found.
+		updateForm(data) {
 			
-			console.log('ZI - Updating form...', data, formShorteningEnabled );
+			// Is form shortening enabled?
+			if (!this.formShorteningEnabled) {return;}
 
-			if (!formShorteningEnabled) {return;}
-
-			data.inputs.forEach((input) => {
-				const field = this.context.querySelector(data.formSelector+' '+input);
-				if (!field) {console.warn('Unable to find field', data.formSelector, input);return;}
-				this.updateField( field, input, data );
+			// Loop through each mapped field.
+			for (const fieldID in data) {
 				
-			});
+				// Skip fields that are populated.
+				if (typeof data[fieldID] !== 'undefined') {continue;}
+				
+				// Get field object.
+				const input = this.formInputs.find(obj => obj.hasOwnProperty(fieldID));
+				if (input) {
+					
+					// Get field container.
+					const fieldContainer = input[fieldID].fieldContainer;
+					if (!fieldContainer) {console.warn('ZI - Unable to find field container', fieldID);return;}
+			
+					// Update field.
+					this.updateField(fieldContainer);
+
+				}
+				
+			}
 
 		}
 
 		// Hide mapped field that is not email nor an excluded field in configurations.
-		readyField( field, input, data ) {
-			
-			console.log('ZI - Readying Field.', field, input, data );
+		readyField( field, input ) {
 			
 			// Analyze field.
 			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
-			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
+			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio', 'checkbox' ].includes(field.getAttribute('type').toLowerCase());
 			const isEmail = ['id', 'name', 'class'].some(identifier => field[identifier] && field[identifier].includes('email') || field.classList.contains('email'));
 			const isExcluded = this.configurations.excludedFields.includes(field.id) || this.configurations.excludedFields.includes(field.name) || field.classList.contains(this.configurations.excludedFields);
 
+			// Should field be displayed?
 			if (isField && !ignoredType && !isEmail && !isExcluded) {
+				
+				// Find container of field.
 				const fieldContainer = this.findContainer(field);
-				if (fieldContainer) {fieldContainer.style.display = 'none';}
-				else {console.warn('ZI - Field Container not found.', field);}
+					
+				// Hide field & any containers.
+				fieldContainer.style.display = 'none';
+
+				// Store field details.
+				const fieldID = input.match(/name='(\w+)'/)[1];
+				this.formInputs.push({[fieldID]:{ selector:input, fieldContainer:fieldContainer }});
+					
 			}
 			
 		}
 		
 		// Update mapped field that is not email nor an excluded field in configurations. If an element is hidden by end-user and is excluded, we will not unhide element spite it being hidden + unpopulated with data, end-user will need to unhide with their own logic if excluded. 
-		updateField( field, input, data ) {
-			
-			console.log('ZI - Updating Field.', field, input, data );
-
-			// If field populated, ignore.
-			if ( data[input] != undefined ) {return;}
-
-			// Find field container.
-			const fieldContainer = this.findContainer(field);
-			if (!fieldContainer) {
-				console.warn('ZI - Field Container not found.', field);
-				return;
-			}
+		updateField(field) {
 
 			// If field is displayed, ignore.
-			if ( fieldContainer.style.display != 'none' ){return;}
+			if ( field.style.display != 'none' ){return;}
 
-			// Analyze field.
-			const isField = ['INPUT', 'SELECT'].includes(field.nodeName);
-			const ignoredType = field.hasAttribute('type') && [ 'reset', 'button', 'submit', 'hidden', 'radio' ].includes(field.getAttribute('type').toLowerCase());//! should radio be excluded?
-			const isExcluded = this.configurations.excludedFields.includes(field.id) || this.configurations.excludedFields.includes(field.name) || field.classList.contains(this.configurations.excludedFields);
-
-			// Field was not populated and is not excluded, display it.
-			if ( isField && !ignoredType && !isExcluded ) {fieldContainer.style.display = '';}
+			// Display field.
+			field.style.display = '';
 
 		}
 		
 	}
-
-    // Initialize FormComplete Global.
-    window._zi_fc = {};
-	
-	// Initialize when ready.
-	window._zi_fc.onReady = function(data) {window.ZI_Form = new ZI_Form( data, window.ZIConfigurations, this.formShorteningEnabled, this.isDevelopmentMode );}
-	
-	// Listen for ZI API matches.
-	window._zi_fc.onMatch = function(data) {window.ZI_Form.updateForm( data, this.formShorteningEnabled );}
 
 	// Antiflicker.
 	const s = document.createElement('style');
 	(s.id = 'ZI_AF'),
 	(s.innerHTML = `${window.ZIConfigurations.formSelector} {opacity:0 !important;}`),
 	document.head.appendChild(s);
+
+    // Initialize FormComplete Global.
+    window._zi_fc = {};
 	
-	
+	// Initialize when ready.
+	window._zi_fc.onReady = function(data) {
+		try {window.ZI_Form = new ZI_Form( data, window.ZIConfigurations, this.formShorteningEnabled );}
+		catch (err) {
+			// If error occurs during instantiation, remove antiflicker.
+			const ZI_AF = document.getElementById('ZI_AF');
+			if (ZI_AF){ZI_AF.remove();}
+			console.warn('ZI - An error occured.', err);
+		}
+	}
+
+	// Listen for ZI API matches.
+	window._zi_fc.onMatch = function(data) {window.ZI_Form.updateForm(data);}
+
 	// Wait for content to complete loading.
 	document.addEventListener('DOMContentLoaded', function() {
 
@@ -247,14 +258,6 @@
 		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
 		document.body.appendChild(zi);
 
-		// Remove Antiflicker - Fallback.
-		setTimeout( function(){
-			const ZI_AF = document.getElementById('ZI_AF');
-			if (ZI_AF){ZI_AF.remove();}
-		}, 1500 );
-
 	}, { once:true, capture:true });
-	
-	console.log('ZI - FormComplete snippet loaded.');
 	
 })();
