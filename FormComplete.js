@@ -19,11 +19,19 @@
 			(zi.type = 'text/javascript'),
 			(zi.async = true),
 			(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
-			(zi.addEventListener('error', function(event) {window.ZI_FormAF.destroy();})),
+			(zi.addEventListener('error', function(event) {
+				
+				console.warn('ZI - An error occured while loading zi-tag.', event);
+				window.ZI_FormAF.destroy();
+			
+			})),
 			document.body.appendChild(zi);
 
 			// Add ready form event.
 			window._zi_fc.onReady = function(data) {
+
+				console.log('ZI - onReady event!', data);
+				
 				try {self.readyForm( data, this.formShorteningEnabled, this.formIframeWrapperSelector );}
 				catch (err) {
 					
