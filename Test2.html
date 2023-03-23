@@ -1,0 +1,85 @@
+<html>
+<head>
+	<title>FormComplete - Test 2</title>
+	<script>
+	
+		/** Configurations
+		 *  
+		 *   formSelector
+		 *		query selector value, example #FormID, .FormClass, Form[Attribute=Value]; This is used to locate the form within a document.
+		 *		This value must be populated if form flicker is occuring.
+		 *  
+		 *   dynamicForm
+		 *		boolean; Does the form not exist when the page initially loads? If true, we can apply our logic automatically when the form appears within the formContainer element.
+		 *  
+		 *   formContainer
+		 *		query selector value, example #FormContainerID, .FormContainerClass, FormContainer[Attribute=Value]; Only used if dynamicForm is true. We will observe this element until the desired form has loaded.
+		 *  
+		 *   excludedFields
+		 *		text value(s); specify 1 or more fields to exclude from form shortenting logic. By default all input and select fields except for email will be hidden, and all hidden fields that are not populated on email match will be unhidden.
+		 *   
+		 */
+		 
+		window.ZIConfigurations = {
+			dynamicForm: false,  // set to true if form does not exist imediatly in document.
+			formSelector: '#example2',
+			formContainer: 'body',
+			fieldContainer: 'fieldx',
+			excludedFields: ['name2', 'notreal']  // id, name or class
+		}
+		
+		// Project key. Get this value from FormComplete.
+		window.ZIProjectKey = "0281657f921669107410"; 
+
+	</script>
+	<script src="FormComplete.js"></script>
+	<link rel="stylesheet" type="text/css" href="Style.css" />
+</head>
+<body>
+
+	<h1>FormComplete Test</h1>
+	<form id="example2">
+		<h3>Simple form, label + span + no attribute div  + div container with class.</h3>
+		<div class="fieldx">
+			<div>
+				<label for="email2">Email</label>
+				<input name="email2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldx">
+			<div>
+				<label for="name2">Name</label>
+				<input name="name2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldx">
+			<div>
+				<label for="company2">Company</label>
+				<input name="company2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldx">
+			<div>
+				<label for="phone2">Phone</label>
+				<input name="phone2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldx">
+			<div>
+				<label for="title2">Job Title</label>
+				<input name="title2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<input type="button" value="Continue">
+	</form>
+	<hr>
+
+</body>
+</html>
