@@ -1,0 +1,136 @@
+<html>
+<head>
+	<title>FormComplete Utility Script Demo - 1</title>
+	<script>
+		window.ZIConfigurations = {
+			formIframe: '',
+			eventForm: false,  // set to true if form does not exist imediatly in document.
+			formContainer: '',
+			formSelector: '#example2',
+			fieldContainer: '.fieldContainer'
+		}
+		
+		// Project key. Get this value from FormComplete.
+		window.ZIProjectKey = "0281657f921669107410"; 
+
+	</script>
+	<script src="FormComplete.js"></script>
+	<link rel="stylesheet" type="text/css" href="Style.css" />
+</head>
+<body>
+
+	<h1>FormComplete Utility Script Demo - 1</h1>
+	<details>
+		<summary>Overview</summary>
+		<p>This utility script builds off the existing logic. It provides an easy to deploy solution which addresses UI complications where customers lack developer resources.
+		<ul>
+			<li>Eliminates flicker; flicker briefly shows mapped fields before being hidden.</li>
+			<li>If form contains unmapped fields, jitter on load is potential trade off .</li>
+			<li>Jitter can be eliminated by applying a single CSS class 'zi_alwaysShow' directly on all unmapped fields.</li>
+			<li>Event generated forms created after 'Form Load Timeout' can now utilize FormComplete without any additional effort from customers.</li>
+			<li>Field containers can now be hidden, resolving potentially akward spacing issues between fields and or visible labels / other field related elements.</li>
+		</ul></p>
+
+		<p><strong>Implementation</strong><br>
+			Idealy, if the resource can be hosted by ZoomInfo, implementation could be as simple as providing the customer with the following code to place in their site's header.<br>
+			There are five configuration values:
+			<ul>
+				<li>formIframe: string, query selector - If form loads in an iframe.</li>
+				<li>eventForm: boolean - Does the form not exist on page load?</li>
+				<li>formContainer: string, query selector - If eventForm is true, specify where the form will be created. This should be the closest parent that is available on load.</li>
+				<li>formSelector: string, query selector - Specify the form selector. Forms lacking a unique ID/Name/Class can also now use: <b>form[action="MyFormActionURL"]</b></li>
+				<li>fieldContainer: string, query selector - Optional; If fields are reside within a container, specify the element's ID, Name, Class, or other attribute. If not provided, the field itself will be hidden.</li>
+			</ul>
+		</p>
+		
+		<p><header>Javascript</header>
+		<code>&lt;script&gt;
+	window.ZIConfigurations = {
+		formIframe: 'iframe[name="MyIframeName"]',
+		eventForm: true,
+		formContainer: 'div#MyFormContainerID',
+		formSelector: 'form[action="MyFormActionURL"]',
+		fieldContainer: 'div.MyFeildContainerClass'
+	}
+	window.ZIProjectKey = "12345678901234567890"; 
+
+	// Do not modify below. 
+	var zi = document.createElement('script');
+	(zi.type = 'text/javascript'),
+	(zi.async = true),
+	(zi.src = 'https://js.zi-scripts.com/zi-fc-af.js'),
+	document.head.appendChild(zi);
+&lt;/script&gt;</code></p>
+
+	</details>
+	<details>
+		<summary>About</summary>
+		<p>This example contains a form with:<br>
+		<ul>
+			<li>5 mapped fields (email, name, company, phone, job title)</li>
+			<li>A text and textarea field (Product Interests and Message)</li>
+		</ul></p>
+		
+		<p>This demo shows Antiflicker functionality and the potential jitter that can occur.<br>
+		The purpose: hide mapped fields when form is loaded.
+		If the form contains any unmapped fields, the client may add the custom class 'zi_alwaysShow' to each field to prevent jitter.</p>
+	</details>
+
+	<form id="example2" autocomplete="off">
+
+		<div class="fieldContainer">
+			<div>
+				<label for="email2">Email</label>
+				<input name="email2" value="" autocomplete="new-password">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="name2">Name</label>
+				<input name="name2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="company2">Company</label>
+				<input name="company2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="phone2">Phone</label>
+				<input name="phone2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="title2">Job Title</label>
+				<input name="title2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="notmapped">Product Interests</label>
+				<input name="notmapped" class="" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="message">Message</label>
+				<textarea name="message" class=""></textarea>
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<input type="button" value="Continue">
+	</form>
+
+</body>
+</html>

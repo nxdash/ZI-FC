@@ -1,0 +1,126 @@
+<html>
+<head>
+	<title>FormComplete Utility Script Demo - 3</title>
+	<script>
+		window.ZIConfigurations = {
+			eventForm: true,  // set to true if form does not exist imediatly in document.
+			formContainer: 'body',
+			formSelector: '#example1',
+			fieldContainer: '.fieldContainer'
+		}
+		
+		// Project key. Get this value from FormComplete.
+		window.ZIProjectKey = "0281657f921669107410"; 
+	</script>
+	<script src="FormComplete.js"></script>
+	<link rel="stylesheet" type="text/css" href="Style.css" />
+</head>
+<body>
+
+	<h1>FormComplete Utility Script Demo - 3</h1>
+	<details>
+		<summary>About</summary>
+		<p>This example contains a form which is created on a trigger (in this example, a button) with:<br>
+		<ul>
+			<li>5 mapped fields (email, name, company, phone, job title)</li>
+			<li>A text field (Product Interests) and textarea field (Message) with class 'zi_alwaysShow'</li>
+		</ul></p>
+		<p>This demo shows the ability to now handle forms that are created after the 'Form Load Timeout' by using a mutation observer on a 'formContainer' object.</p>
+	</details>
+
+	<div id="loadedCounter">This page has been loaded for <span></span></div>
+	<script>
+		(function() {
+			const loadedCounter = document.querySelector('#loadedCounter span');
+			const startTime = Date.now();
+			function updateLoadedCounter() {
+				var currentTime = Date.now();
+				var elapsedTime = Math.floor((currentTime - startTime) / 1000);
+				var minutes = Math.floor(elapsedTime / 60);
+				var seconds = elapsedTime % 60;
+				var output = '';
+				if (minutes == 0) {output += seconds + ' seconds';} else
+				if (minutes == 1) {output += '1 minute and ' + seconds + ' seconds';} else
+				if (minutes > 1) {output += minutes + ' minutes and ' + seconds + ' seconds';}
+				loadedCounter.innerText = output;
+			}
+			setInterval(updateLoadedCounter, 1000);
+		})();
+	</script>
+
+	<input id="generateForm" type="button" value="Generate form">
+	<script>
+	
+		// Dynamic Form.
+		const generateForm = document.querySelector('#generateForm');
+		generateForm.addEventListener('click', function(event) {
+		
+			// Disable button and remove trigger...
+			generateForm.disabled = true;
+			generateForm.removeEventListener('click', arguments.callee);
+		
+			// Create the form.
+			const form1 = document.createElement('form');
+			form1.id = 'example1';
+			form1.setAttribute('autocomplete', 'off');
+			form1.innerHTML = `
+			<div class="fieldContainer">
+				<div>
+					<label for="email">Email</label>
+					<input name="email" value="" autocomplete="new-password">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="name">Name</label>
+					<input name="name" value="">
+					<span class="instructions"></span>
+				</div>
+				<span class="notes"></span>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="company">Company</label>
+					<input name="company" value="">
+					<span class="instructions"></span>
+				</div>
+				<span class="notes"></span>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="phone">Phone</label>
+					<input name="phone" value="">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="title">Job Title</label>
+					<input name="title" value="">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="notmapped">Product Interests</label>
+					<input name="notmapped" class="zi_alwaysShow" value="">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="message">Message</label>
+					<textarea name="message" class="zi_alwaysShow"></textarea>
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<input type="button" value="Continue">
+			`;
+			document.body.appendChild(form1);
+		});
+		
+	</script>
+
+</body>
+</html>
