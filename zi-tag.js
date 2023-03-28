@@ -220,27 +220,10 @@ class ZI_Form {
 			if (self.configurations.eventForm && self.configurations.eventForm == true) {self.observer();}
 			else {
 
-				// Form Should now exist. Since FormComplete has yet to be called, check if configurations are supplied.  If so, try to locate form that way.
-				if ( !self.configurations.formSelector || self.configurations.formSelector.length == 0 ) {console.log("%cZI - Form not defined in configurations.", self.consoleWarnStyle);return;}
-					
-				// Is form within iFrame?
-				if ( self.configurations.formIframe &&  self.configurations.formIframe.length ) {
-					
-					let iframe = document.querySelector( self.configurations.formIframe );
-					if (!iframe) {console.log("%cZI - iFrame not detected.\nIf iFrame is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
-					let formExists = iframe.contentWindow.document.querySelector(self.formSelector);
-					if (!formExists) {console.log("%cZI - Form not detected.\nIf form is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
-						
-				} else {
-
-					let formExists = document.querySelector(self.formSelector);
-					if (!formExists) {console.log("%cZI - Form not detected.\nIf form is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
-				}
+				// Ready!
+				self.ready();
 
 			}
-
-			// Ready!
-			self.ready();
 
 		// Remove listener after running once.
 		}, { once:true, capture:true });
