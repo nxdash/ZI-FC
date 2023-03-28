@@ -187,6 +187,9 @@ const GetListOfEntitlements=async()=>{
 			if(subscriptions.sch){InsertScheduleScript(subscriptions.sch)}
 			if(subscriptions.chat){InsertChatScript(subscriptions.chat)}
 
+			// Check if ZIConfigurations has been supplied in snippet. If it has, let utility handle FormComplete loading, otherwise run as normal.
+			if(!window.ZIConfigurations && subscriptions.fc){InsertScheduleScript(subscriptions.fc)}
+
 		} else {console.log("ZI - An error occured in response", response.body);}
 		
 	} catch(e) {console.error("ZI - An error occured", e);}
@@ -198,19 +201,16 @@ GetListOfEntitlements();
 class ZI_Form {
 
 	constructor() {
+		
+		// If ZIConfigurations is not defined, do nothing.
+		if (!window.ZIConfigurations) {return;}
 
 		let self = this;
 
 		// Store properties.
 		this.consoleErrorStyle	= 'color:#FF0000;font-size:14px;line-height:24px;';
 		this.consoleInfoStyle	= 'color:#AAAAAA;font-size:14px;line-height:24px;';
-		this.configurations = window.ZIConfigurations || {
-			formIframe: '',
-			eventForm: false,
-			eventFormContainer: '',
-			formSelector: '',
-			fieldContainer: ''
-		};
+		this.configurations = window.ZIConfigurations;
 
 		console.log(`%cZI - Initializing...\n${JSON.stringify(this.configurations)}`, this.consoleInfoStyle);
 
@@ -448,10 +448,13 @@ class ZI_FormAF {
 	
 	constructor() {
 		
+		// If ZIConfigurations is not defined, do nothing.
+		if (!window.ZIConfigurations) {return;}
+		
 		let self = this;
 
 		// Store properties.
-		this.configurations = window.ZIConfigurations || '';
+		this.configurations = window.ZIConfigurations;
 
 		// Begin creation of AF style element.
 		const af = document.createElement('style');
@@ -461,7 +464,7 @@ class ZI_FormAF {
 		if ( this.configurations.formIframe && this.configurations.formIframe.length ) {
 			
 			// Make iFrame invisble for a moment.
-			af.innerHTML = `${window.ZIConfigurations.formIframe} {visibility:hidden !important;transition:height 0.25s ease;}`;
+			af.innerHTML = `${this.configurations.formIframe} {visibility:hidden !important;transition:height 0.25s ease;}`;
 			document.head.appendChild(af);
 
 		} else
