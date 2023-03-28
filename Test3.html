@@ -1,18 +1,26 @@
 <html>
 <head>
 	<title>FormComplete Utility Script Demo - 3</title>
+
 	<script>
+
+		window.ZIProjectKey = "0281657f921669107410";
 		window.ZIConfigurations = {
-			eventForm: true,  // set to true if form does not exist imediatly in document.
-			formContainer: 'body',
+			formIframe: '',
+			eventForm: true,
+			eventFormContainer: 'body',
 			formSelector: '#example1',
 			fieldContainer: '.fieldContainer'
 		}
-		
-		// Project key. Get this value from FormComplete.
-		window.ZIProjectKey = "0281657f921669107410"; 
+
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'zi-tag.js'),
+		document.head.appendChild(zi);
+
 	</script>
-	<script src="FormComplete.js"></script>
+
 	<link rel="stylesheet" type="text/css" href="Style.css" />
 </head>
 <body>
@@ -25,7 +33,7 @@
 			<li>5 mapped fields (email, name, company, phone, job title)</li>
 			<li>A text field (Product Interests) and textarea field (Message) with class 'zi_alwaysShow'</li>
 		</ul></p>
-		<p>This demo shows the ability to now handle forms that are created after the 'Form Load Timeout' by using a mutation observer on a 'formContainer' object.</p>
+		<p>This demo shows the ability to now handle forms that are created after the 'Form Load Timeout' by using a mutation observer on a 'eventFormContainer' object.</p>
 	</details>
 
 	<div id="loadedCounter">This page has been loaded for <span></span></div>
@@ -63,8 +71,7 @@
 			const form1 = document.createElement('form');
 			form1.id = 'example1';
 			form1.setAttribute('autocomplete', 'off');
-			form1.innerHTML = `
-			<div class="fieldContainer">
+			form1.innerHTML = `<div class="fieldContainer">
 				<div>
 					<label for="email">Email</label>
 					<input name="email" value="" autocomplete="new-password">
@@ -115,8 +122,7 @@
 					<span class="instructions"></span>
 				</div>
 			</div>
-			<input type="button" value="Continue">
-			`;
+			<input type="button" value="Continue">`;
 			document.body.appendChild(form1);
 		});
 		

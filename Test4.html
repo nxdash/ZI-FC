@@ -1,18 +1,26 @@
 <html>
 <head>
 	<title>FormComplete Utility Script Demo - 4</title>
-	<script>		 
+
+	<script>
+
+		window.ZIProjectKey = "badkeyhere";
 		window.ZIConfigurations = {
-			eventForm: true,  // set to true if form does not exist imediatly in document.
-			formContainer: 'body',
+			formIframe: '',
+			eventForm: true,
+			eventFormContainer: 'body',
 			formSelector: '#example1',
 			fieldContainer: '.fieldContainer'
 		}
-		
-		// Invalid Project key.
-		window.ZIProjectKey = "x0281657f921669107410"; 
+
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'zi-tag.js'),
+		document.head.appendChild(zi);
+
 	</script>
-	<script src="FormComplete.js"></script>
+
 	<link rel="stylesheet" type="text/css" href="Style.css" />
 </head>
 <body>
@@ -23,9 +31,10 @@
 		<p>This example contains a form which is created on a trigger (in this example, a button) with:<br>
 		<ul>
 			<li>5 mapped fields (email, name, company, phone, job title)</li>
+			<li>A text field (Product Interests) and textarea field (Message) with class 'zi_alwaysShow'</li>
 		</ul></p>
 		
-		<p>This demo shows the error handling and that the Antiflicker styling is removed on error.</p>
+		<p>This demo shows error handling and the removal of the Antiflicker styling on error/issue.</p>
 		
 	</details>
 
@@ -44,8 +53,7 @@
 			const form1 = document.createElement('form');
 			form1.id = 'example1';
 			form1.setAttribute('autocomplete', 'off');
-			form1.innerHTML = `
-			<div class="fieldContainer">
+			form1.innerHTML = `<div class="fieldContainer">
 				<div>
 					<label for="email">Email</label>
 					<input name="email" value="" autocomplete="new-password">
@@ -82,8 +90,21 @@
 					<span class="instructions"></span>
 				</div>
 			</div>
-			<input type="button" value="Continue">
-			`;
+			<div class="fieldContainer">
+				<div>
+					<label for="notmapped">Product Interests</label>
+					<input name="notmapped" class="zi_alwaysShow" value="">
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<div class="fieldContainer">
+				<div>
+					<label for="message">Message</label>
+					<textarea name="message" class="zi_alwaysShow"></textarea>
+					<span class="instructions"></span>
+				</div>
+			</div>
+			<input type="button" value="Continue">`;
 			document.body.appendChild(form1);
 		});
 		

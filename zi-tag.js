@@ -1,5 +1,6 @@
 if(!window.zi){window.zi={}}
-const consoleTagStyle	= 'color:#0000FF;font-size:12px;line-height:24px;';
+
+const consoleTagStyle	= 'color:#0000FF;font-size:14px;line-height:24px;';
 const SCHEDULE_BACKEND_URL=window.ZITagEnv==="dev"?"https://schedule-staging.zoominfo.com/zischedule.js":"https://schedule.zoominfo.com/zischedule.js";
 const FORMCOMPLETE_BACKEND_URL=window.ZITagEnv==="dev"?"https://ws-assets-staging.zoominfo.com/formcomplete.js":"https://ws-assets.zoominfo.com/formcomplete.js";
 const ZI_TAG_BACKEND_URL=window.ZITagEnv==="dev"?"https://js-staging.zi-scripts.com/unified/v1/master/getSubscriptions":"https://js.zi-scripts.com/unified/v1/master/getSubscriptions";
@@ -184,7 +185,6 @@ const GetListOfEntitlements=async()=>{
 
 			if(subscriptions.length===0){console.log("%cZI - No ZI subscriptions found", consoleTagStyle)}
 			if(subscriptions.sch){InsertScheduleScript(subscriptions.sch)}
-		//	if(subscriptions.fc){InsertFormCompleteScript(subscriptions.fc)}
 			if(subscriptions.chat){InsertChatScript(subscriptions.chat)}
 
 		} else {console.log("ZI - An error occured in response", response.body);}
@@ -192,6 +192,7 @@ const GetListOfEntitlements=async()=>{
 	} catch(e) {console.error("ZI - An error occured", e);}
 	
 };
+
 GetListOfEntitlements();
 
 class ZI_Form {
@@ -201,8 +202,8 @@ class ZI_Form {
 		let self = this;
 
 		// Store properties.
-		this.consoleErrorStyle	= 'color:#FF0000;font-size:12px;line-height:24px;';
-		this.consoleInfoStyle	= 'color:#AAAAAA;font-size:12px;line-height:24px;';
+		this.consoleErrorStyle	= 'color:#FF0000;font-size:14px;line-height:24px;';
+		this.consoleInfoStyle	= 'color:#AAAAAA;font-size:14px;line-height:24px;';
 		this.configurations = window.ZIConfigurations || {
 			formIframe: '',
 			eventForm: false,
@@ -484,5 +485,6 @@ class ZI_FormAF {
 	}
 	
 }
+
 window.ZI_FormAF = new ZI_FormAF();
 window.ZI_Form = new ZI_Form();

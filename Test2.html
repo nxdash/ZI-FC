@@ -1,16 +1,26 @@
 <html>
 <head>
 	<title>FormComplete Utility Script Demo - 2</title>
+
 	<script>
+
+		window.ZIProjectKey = "0281657f921669107410";
 		window.ZIConfigurations = {
-			eventForm: false,  // set to true if form does not exist imediatly in document.
-			formContainer: '',
+			formIframe: '',
+			eventForm: false,
+			eventFormContainer: '',
 			formSelector: '#example2',
 			fieldContainer: '.fieldContainer'
 		}
-		window.ZIProjectKey = "0281657f921669107410"; 
+
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'zi-tag.js'),
+		document.head.appendChild(zi);
+
 	</script>
-	<script src="FormComplete.js"></script>
+
 	<link rel="stylesheet" type="text/css" href="Style.css" />
 </head>
 <body>
@@ -87,7 +97,6 @@
 		</div>
 		<input type="button" value="Continue">
 	</form>
-	<hr>
 
 </body>
 </html>
