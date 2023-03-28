@@ -185,10 +185,8 @@ const GetListOfEntitlements=async()=>{
 
 			if(subscriptions.length===0){console.log("%cZI - No ZI subscriptions found", consoleTagStyle)}
 			if(subscriptions.sch){InsertScheduleScript(subscriptions.sch)}
+			if(!window.ZIConfigurations && subscriptions.fc){InsertFormCompleteScript(subscriptions.fc)}// Check if ZIConfigurations has been supplied in snippet. If it has, let utility handle FormComplete loading, otherwise run as normal.
 			if(subscriptions.chat){InsertChatScript(subscriptions.chat)}
-
-			// Check if ZIConfigurations has been supplied in snippet. If it has, let utility handle FormComplete loading, otherwise run as normal.
-			if(!window.ZIConfigurations && subscriptions.fc){InsertScheduleScript(subscriptions.fc)}
 
 		} else {console.log("ZI - An error occured in response", response.body);}
 		
