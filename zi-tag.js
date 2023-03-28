@@ -1,6 +1,6 @@
 if(!window.zi){window.zi={}}
 
-const consoleTagStyle	= 'color:#0000FF;font-size:14px;line-height:24px;';
+const consoleTagStyle	= 'color:#0F00FF;font-size:12px;line-height:24px;';
 const SCHEDULE_BACKEND_URL=window.ZITagEnv==="dev"?"https://schedule-staging.zoominfo.com/zischedule.js":"https://schedule.zoominfo.com/zischedule.js";
 const FORMCOMPLETE_BACKEND_URL=window.ZITagEnv==="dev"?"https://ws-assets-staging.zoominfo.com/formcomplete.js":"https://ws-assets.zoominfo.com/formcomplete.js";
 const ZI_TAG_BACKEND_URL=window.ZITagEnv==="dev"?"https://js-staging.zi-scripts.com/unified/v1/master/getSubscriptions":"https://js.zi-scripts.com/unified/v1/master/getSubscriptions";
@@ -206,8 +206,9 @@ class ZI_Form {
 		let self = this;
 
 		// Store properties.
-		this.consoleErrorStyle	= 'color:#FF0000;font-size:14px;line-height:24px;';
-		this.consoleInfoStyle	= 'color:#AAAAAA;font-size:14px;line-height:24px;';
+		this.consoleErrorStyle	= 'color:#FF0000;font-size:12px;line-height:24px;';
+		this.consoleInfoStyle	= 'color:#AAAAAA;font-size:12px;line-height:24px;';
+		this.consoleWarnStyle	= 'color:#8F00FF;font-size:12px;line-height:24px;';
 		this.configurations = window.ZIConfigurations;
 
 		console.log(`%cZI - Initializing...\n${JSON.stringify(this.configurations)}`, this.consoleInfoStyle);
@@ -215,9 +216,31 @@ class ZI_Form {
 		// Wait for document / iframe to complete loading.
 		document.addEventListener('load', function() {
 
-			// Is eventForm enabled?
+			// If eventForm is true, set observer.
 			if (self.configurations.eventForm && self.configurations.eventForm == true) {self.observer();}
-			else {self.ready();}
+			else {
+
+				// Form Should now exist. Since FormComplete has yet to be called, check if configurations are supplied.  If so, try to locate form that way.
+				if ( !self.configurations.formSelector || self.configurations.formSelector.length == 0 ) {console.log("%cZI - Form not defined in configurations.", self.consoleWarnStyle);return;}
+					
+				// Is form within iFrame?
+				if ( self.configurations.formIframe &&  self.configurations.formIframe.length ) {
+					
+					let iframe = document.querySelector( self.configurations.formIframe );
+					if (!iframe) {console.log("%cZI - iFrame not detected.\nIf iFrame is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
+					let formExists = iframe.contentWindow.document.querySelector(self.formSelector);
+					if (!formExists) {console.log("%cZI - Form not detected.\nIf form is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
+						
+				} else {
+
+					let formExists = document.querySelector(self.formSelector);
+					if (!formExists) {console.log("%cZI - Form not detected.\nIf form is on page, ensure snippet configurations are correct.", self.consoleWarnStyle);return;}
+				}
+
+			}
+
+			// Ready!
+			self.ready();
 
 		// Remove listener after running once.
 		}, { once:true, capture:true });
@@ -273,12 +296,12 @@ class ZI_Form {
 
 	async checkEntitlement() {
 		
-		var errors = '';
+		let errors = '';
 		
 		try {
 			
 			let response=await fetch( ZI_TAG_BACKEND_URL, { method:"GET", headers:{ "Content-Type":"application/json", Authorization:"Bearer " + window.ZIProjectKey } } );
-			if ( response.status!==200){errors += "Response Status: " + response.status + "\n";}
+			if (response.status!==200){errors += "Response Status: " + response.status + "\n";}
 
 			const data=await response.json();
 			if (!data){errors += "Data not set.\n";}
@@ -306,28 +329,30 @@ class ZI_Form {
 
 		// Note: Using contentWindow.document instead of contentDocument for more browser compatibility.
 
-		if (this.formSelector && this.formSelector.length > 0) {
+		if (this.formSelector && this.formSelector.length) {
 			
-			if ( this.configurations.formIframe && this.configurations.formIframe.length > 0) {
-				var iframe = document.querySelector( this.configurations.formIframe );
+			if ( this.configurations.formIframe && this.configurations.formIframe.length) {
+				let iframe = document.querySelector( this.configurations.formIframe );
 				if (iframe) {
-					var iframeForm = iframe.contentWindow.document.querySelector(this.formSelector);
+					let iframeForm = iframe.contentWindow.document.querySelector(this.formSelector);
 					if (iframeForm) {return iframe.contentWindow.document;}
 				}
 			}
 
-			if ( this.formIframeWrapperSelector && this.formIframeWrapperSelector.length > 0 ) {
-				var iframes = document.querySelectorAll(this.formIframeWrapperSelector);
-				for (var i=0; i < iframes.length; i++) {
-					var iframe = iframes[i];
-					var iframeForm = iframe.contentWindow.document.querySelector(this.formSelector);
+			if ( this.formIframeWrapperSelector && this.formIframeWrapperSelector.length) {
+				let iframes = document.querySelectorAll(this.formIframeWrapperSelector);
+				for (let i=0; i < iframes.length; i++) {
+					let iframe = iframes[i];
+					let iframeForm = iframe.contentWindow.document.querySelector(this.formSelector);
 					if (iframeForm) {return iframe.contentWindow.document;}
 				}
 			}
+
+			return document;
 			
 		}
 
-		return document;
+		return null;
 
 	}
 
@@ -359,7 +384,14 @@ class ZI_Form {
 		this.formFields = [];
 		this.formSelector = this.configurations.formSelector?.trim() ?? data.formSelector;
 		this.context = this.getContext();
-
+		
+		// Was context not found?
+		if (!this.context) {
+			window.ZI_FormAF.destroy();
+			console.log("%cZI - Form not detected.\nIf form is generated on an event trigger, ensure the configuration 'eventForm' is set to true, and 'eventFormContainer' is a parent element that exists on load. ", this.consoleWarnStyle);
+			return;
+		}
+		
 		try {
 
 			// Is form shortening enabled?

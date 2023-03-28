@@ -1,0 +1,38 @@
+<html>
+<head>
+	<title>FormComplete Utility Script - Demo 6</title>
+
+	<script>
+
+		window.ZIProjectKey = "0281657f921669107410";
+		window.ZIConfigurations = {
+			formIframe: '.hs-form-iframe',
+			eventForm: false,
+			eventFormContainer: '',
+			formSelector: 'form.hs-form',
+			fieldContainer: ''
+		}
+
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'zi-tag.js'),
+		document.head.appendChild(zi);
+
+	</script>
+
+	<link rel="stylesheet" type="text/css" href="Style.css" />
+</head>
+<body>
+
+	<h1>FormComplete Utility Script - Demo 6</h1>
+	<details>
+		<summary>About</summary>
+		<p>This example shows the script being able to realize there is no form and to stop logic gracefully.<br>
+		This is useful when customers wish to deploy this snippet in a header used accross their site VS per page with form included.</p>
+	</details>
+
+	<div id="example5">A non-form page.</div>
+
+</body>
+</html>
