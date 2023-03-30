@@ -1,23 +1,111 @@
-<script>
+<html>
+<head>
+	<title>FormComplete Temp Depreciatation Patch</title>
+	<script>
+	
+		// OLD custom scripts for non-unified FormComplete.
+		window._zi = {
+			formLoadTimeout: 4000,
+			callbacks: {
+				onReady: function(data) {console.log("\n\nDepreciated onReady triggered!!!", this, data);},
+				onMatch: function(data) {console.log("\n\nDepreciated onMatch triggered!!!", this, data);}
+			}
+		};
 
-	window.ZIProjectKey = "0281657f921669107410";
-	var zi = document.createElement('script');
-	(zi.type = 'text/javascript'),
-	(zi.async = true),
-	(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
-	document.body.appendChild(zi);
-	
-	if (window._zi){
-	
-		if (window._zi_fc.onReady) {console.log('onReady not found...');}
-		if (window._zi_fc.onMatch) {console.log('onReady not found...');}
-	
-	} else {
-	
-	console.log('ZI global not found');
-	
-	}
+		// Load zi-tag
+		window.ZIProjectKey = "0281657f921669107410";
+		var zi = document.createElement('script');
+		(zi.type = 'text/javascript'),
+		(zi.async = true),
+		(zi.src = 'https://js.zi-scripts.com/zi-tag.js'),
+		document.body.appendChild(zi);
 
-</script>
+		// PATCH
+		// Wait for site to load fully. This would be placed in formcomplete file...
+		document.addEventListener('DOMContentLoaded', function(event){
+			// Is the depreciated global defined?
+			if (window._zi){
 
-Meh
+				console.warn("\nZI - Depreciated FromComplete script detected.\nPlease ensure you update the FormComplete scripting.\n");
+				
+				// Added alter for customers specifying a formLoadTimeout + that isn't the default value.
+				if (window._zi.formLoadTimeout && window._zi.formLoadTimeout != 4000){console.warn("ZI - The formLoadTimeout variable no longer will be honored and is now a setting within FormComplete.\nPlease ensure this setting is updated according if needed.");}
+				
+				// Add fallback triggers passing data.
+				//!!! Is the data that is returned different?
+				window._zi_fc.onReady = function(data) {window._zi.callbacks.onReady(data);}
+				window._zi_fc.onMatch = function(data) {window._zi.callbacks.onMatch(data);}
+
+			}
+
+		});
+
+	</script>
+	<link rel="stylesheet" type="text/css" href="Style.css" />
+</head>
+<body>
+
+	<h1>FormComplete Temp Depreciatation Patch</h1>
+	<details>
+		<summary>About</summary>
+		<p></p>
+	</details>
+
+	<form id="example2" autocomplete="off">
+
+		<div class="fieldContainer">
+			<div>
+				<label for="email2">Email</label>
+				<input name="email2" value="" autocomplete="new-password">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="name2">Name</label>
+				<input name="name2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="company2">Company</label>
+				<input name="company2" value="">
+				<span class="instructions"></span>
+			</div>
+			<span class="notes"></span>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="phone2">Phone</label>
+				<input name="phone2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="title2">Job Title</label>
+				<input name="title2" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="notmapped">Product Interests</label>
+				<input name="notmapped" class="" value="">
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<div class="fieldContainer">
+			<div>
+				<label for="message">Message</label>
+				<textarea name="message" class=""></textarea>
+				<span class="instructions"></span>
+			</div>
+		</div>
+		<input type="button" value="Continue">
+	</form>
+
+</body>
+</html>
