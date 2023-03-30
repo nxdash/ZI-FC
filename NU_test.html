@@ -33,6 +33,7 @@
 				
 				// Add fallback triggers passing data.
 				//!!! Is the data that is returned different?
+				if (!window._zi_fc) {window._zi_fc = {};}
 				window._zi_fc.onReady = function(data) {window._zi.callbacks.onReady(data);}
 				window._zi_fc.onMatch = function(data) {window._zi.callbacks.onMatch(data);}
 
